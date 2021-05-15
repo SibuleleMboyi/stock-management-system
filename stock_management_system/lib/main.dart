@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/blocs/auth_bloc/bloc/auth_bloc.dart';
 import 'package:stock_management_system/config/custom_router.dart';
 import 'package:stock_management_system/repositories/auth/auth_repository.dart';
+import 'package:stock_management_system/repositories/products/product_repository.dart';
 import 'package:stock_management_system/screens/screens.dart';
 
 void main() async {
@@ -22,6 +23,9 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthRepository>(create: (_) => AuthRepository()),
+        RepositoryProvider<ProductRepository>(
+          create: (_) => ProductRepository(),
+        ),
       ],
       child: MultiBlocProvider(
         providers: [

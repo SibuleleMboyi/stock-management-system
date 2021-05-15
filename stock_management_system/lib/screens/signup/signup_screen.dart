@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/repositories/auth/auth_repository.dart';
 import 'package:stock_management_system/screens/signup/cubit/signup_cubit.dart';
+import 'package:stock_management_system/screens/signup/widgets/widgets.dart';
 import 'package:stock_management_system/widgets/widgets.dart';
 
 class SignupScreen extends StatelessWidget {

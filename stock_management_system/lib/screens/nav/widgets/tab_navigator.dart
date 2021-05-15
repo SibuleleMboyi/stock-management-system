@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stock_management_system/screens/nav/enums/enums.dart';
-import 'package:stock_management_system/screens/shipping_in/shipping_in.dart';
+import 'package:stock_management_system/screens/screens.dart';
 
 class TabNavigator extends StatelessWidget {
   static const String tabNavigatorRoot = '/';

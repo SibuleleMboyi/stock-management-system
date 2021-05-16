@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stock_management_system/repositories/products/product_repository.dart';
-import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
 import 'package:stock_management_system/screens/shipping_in/widgets/form.dart';
 
 /// New stock that is coming to be stocked into the shelves
@@ -11,21 +8,17 @@ class ShippingInScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          ShippingInCubit(productRepository: context.read<ProductRepository>()),
-      child: Scaffold(
-        appBar: AppBar(
-          title: Center(child: Text('Add New Stock')),
-        ),
-        resizeToAvoidBottomInset: false,
-        body: SingleChildScrollView(
-          child: Card(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
-              child: FormWidget(),
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Center(child: Text('Add New Stock')),
+      ),
+      resizeToAvoidBottomInset: false,
+      body: SingleChildScrollView(
+        child: Card(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
+            child: FormWidget(),
           ),
         ),
       ),

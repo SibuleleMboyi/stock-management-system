@@ -16,4 +16,9 @@ class ProductRepository extends BaseProductRepository {
         .collection(Paths.products)
         .add(product.toDocument());
   }
+
+  @override
+  Future<void> addToCart({@required Product product}) async {
+    await _firebaseFirestore.collection(Paths.cart).add(product.toDocument());
+  }
 }

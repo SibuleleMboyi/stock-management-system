@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/helpers/helpers.dart';
-import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
+import 'package:stock_management_system/widgets/widgets.dart';
 
 class FormWidget extends StatefulWidget {
   @override
@@ -15,10 +15,32 @@ class _FormWidgetState extends State<FormWidget> {
   TextEditingController controller = TextEditingController();
 
   @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocConsumer<ShippingOutCubit, ShippingOutState>(
       listener: (context, state) {
-        // TODO: implement listener
+        if (state.status == ShippingOutStatus.success) {
+          _formkey.currentState.reset();
+          controller.clear();
+          context.read<ShippingOutCubit>().reset();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+              content: const Text('Item added to cart'),
+            ),
+          );
+        } else if (state.status == ShippingOutStatus.error) {
+          showDialog(
+            context: context,
+            builder: (context) => ErrorDialog(content: state.failure.message),
+          );
+        }
       },
       builder: (context, state) {
         return Form(
@@ -35,7 +57,7 @@ class _FormWidgetState extends State<FormWidget> {
                     ),
                     controller: controller,
                     onChanged: (value) => context
-                        .read<ShippingInCubit>()
+                        .read<ShippingOutCubit>()
                         .productBarcodeChanged(value),
                     validator: (value) => value.isEmpty
                         ? "enter or scan the product's barcode"
@@ -73,7 +95,7 @@ class _FormWidgetState extends State<FormWidget> {
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 onChanged: (value) => context
-                    .read<ShippingInCubit>()
+                    .read<ShippingOutCubit>()
                     .quantityChanged(num.tryParse(value)),
                 validator: (value) =>
                     value.isEmpty ? "enter the product's quantity" : null,
@@ -86,8 +108,10 @@ class _FormWidgetState extends State<FormWidget> {
                   shadowColor: Colors.grey,
                 ),
                 onPressed: () => _submitForm(
-                    context, state.status == ShippingOutStatus.submitting),
-                child: Text('add'),
+                  context,
+                  state.status == ShippingOutStatus.submitting,
+                ),
+                child: Text('add to cart'),
               ),
             ],
           ),

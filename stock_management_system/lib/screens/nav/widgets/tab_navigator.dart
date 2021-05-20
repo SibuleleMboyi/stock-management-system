@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stock_management_system/config/custom_router.dart';
 import 'package:stock_management_system/repositories/products/product_repository.dart';
 import 'package:stock_management_system/screens/nav/enums/enums.dart';
 import 'package:stock_management_system/screens/screens.dart';
@@ -33,6 +34,7 @@ class TabNavigator extends StatelessWidget {
           ),
         ];
       },
+      onGenerateRoute: CustomRouter.onGenerateNestedRoute,
     );
   }
 
@@ -45,18 +47,19 @@ class TabNavigator extends StatelessWidget {
   Widget _getScreen(BuildContext context, BottomNavItem item) {
     switch (item) {
       case BottomNavItem.shippingIn:
-        return BlocProvider(
-          create: (context) => ShippingInCubit(
+        return BlocProvider<ShippingInCubit>(
+          create: (_) => ShippingInCubit(
               productRepository: context.read<ProductRepository>()),
           child: ShippingInScreen(),
         );
 
       case BottomNavItem.shippingOut:
-        return BlocProvider(
-          create: (context) => ShippingOutCubit(
+        return BlocProvider<ShippingOutCubit>(
+          create: (_) => ShippingOutCubit(
               productRepository: context.read<ProductRepository>()),
           child: ShippingOutScreen(),
         );
+
       default:
         return Scaffold();
     }

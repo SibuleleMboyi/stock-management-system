@@ -45,6 +45,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   backdrop: ^0.6.1
   flutter_barcode_scanner: ^2.0.0
+  expandable_bottom_sheet: ^1.0.0+2
+  modal_bottom_sheet: ^2.0.0
 
 dev_dependencies:
   flutter_test:

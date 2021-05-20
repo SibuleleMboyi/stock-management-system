@@ -13,9 +13,54 @@ class ShippingInCubit extends Cubit<ShippingInState> {
       : _productRepository = productRepository,
         super(ShippingInState.initial());
 
-  void productBarcodeChanged(String value) {
-    emit(state.copyWith(
-        productBarCode: value, status: ShippingInStatus.initial));
+  /// This function receives a product barcode and
+  /// peforms a search for the corresponding product in the database.
+  /// If the product is found,this function emits an error status.
+  /// Otherwise it emits this product barcode.
+  Future<void> searchProduct(String productBarCode) async {
+    final isProductAvailable = await _productRepository.isProductAvailable(
+      productBarCode: productBarCode,
+    );
+
+    if (isProductAvailable == null) {
+      emit(
+        state.copyWith(
+          productBarCode: productBarCode,
+          status: ShippingInStatus.initial,
+        ),
+      );
+    } else {
+      emit(
+        state.copyWith(
+          failure: Failure(
+            message:
+                "product barcode *$productBarCode* is already in stock, update product ?",
+          ),
+          status: ShippingInStatus.error,
+        ),
+      );
+    }
+  }
+
+  /// While typing(or scanning) product barcode, this function contiously checks if it already exists
+  /// in the database by calling 'searchProduct()' function.
+  /// Check description of 'searchProduct()' function.
+  /// Because a user can choose to cancel the typed in barcode until the field is empty.
+  /// To avoid searching for an empty product id (productBarcode) in the database(it crashes the App).
+  /// The null  productBarCode value is emitted and this will be handled by the Form validation method
+  /// when submitting the form.
+
+  void productBarcodeChanged(String productBarCode) async {
+    if (productBarCode.length < 1) {
+      emit(
+        state.copyWith(
+          productBarCode: productBarCode,
+          status: ShippingInStatus.initial,
+        ),
+      );
+    } else {
+      await searchProduct(productBarCode);
+    }
   }
 
   void productNameChanged(String value) {
@@ -39,31 +84,21 @@ class ShippingInCubit extends Cubit<ShippingInState> {
   }
 
   void addNewStock() async {
-    /*if (!state.isFormValid || state.status == ShippingInStatus.submitting) {
+    if (!state.isFormValid || state.status == ShippingInStatus.submitting) {
       return;
-    }*/
-
-    print('Updated Values :::::::::::::::::');
-    print(state.productBarCode);
-    print(state.productName);
-    print(state.productBrand);
-    print(state.quantity);
-    print(state.price);
+    }
 
     emit(state.copyWith(status: ShippingInStatus.submitting));
 
-    try {
-      final product = Product(
-        productBarCode: state.productBarCode,
-        productName: state.productName,
-        productBrand: state.productName,
-        quantity: state.quantity,
-        price: state.price,
-      );
-      await _productRepository.addNewStockProduct(product: product);
-      emit(state.copyWith(status: ShippingInStatus.success));
-    } on Failure catch (err) {
-      emit(state.copyWith(failure: err, status: ShippingInStatus.error));
-    }
+    final product = Product(
+      productBarCode: state.productBarCode,
+      productName: state.productName,
+      productBrand: state.productBrand,
+      quantity: state.quantity,
+      price: state.price,
+    );
+
+    await _productRepository.addNewStockProduct(product: product);
+    emit(state.copyWith(status: ShippingInStatus.success));
   }
 }

@@ -23,10 +23,11 @@ class ShippingOutState extends Equatable {
 
   factory ShippingOutState.initial() {
     return ShippingOutState(
-        productBarCode: null,
-        quantity: 0,
-        status: ShippingOutStatus.initial,
-        failure: Failure());
+      productBarCode: null,
+      quantity: 0,
+      status: ShippingOutStatus.initial,
+      failure: Failure(),
+    );
   }
 
   ShippingOutState copyWith({

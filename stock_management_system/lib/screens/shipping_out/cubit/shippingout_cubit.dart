@@ -8,18 +8,62 @@ part 'shippingout_state.dart';
 
 class ShippingOutCubit extends Cubit<ShippingOutState> {
   ProductRepository _productRepository;
+  Product product;
   ShippingOutCubit({
     ProductRepository productRepository,
   })  : _productRepository = productRepository,
         super(ShippingOutState.initial());
 
-  void productBarcodeChanged(String value) {
-    emit(state.copyWith(
-        productBarCode: value, status: ShippingOutStatus.initial));
+  /// This function receives a product barcode and
+  /// peforms a search for the corresponding product in the database.
+  /// If the product is not found,this function emits an error status.
+  /// Otherwise it emits this product barcode.
+  Future<void> searchProduct(String productBarCode) async {
+    final isProductAvailable = await _productRepository.isProductAvailable(
+      productBarCode: productBarCode,
+    );
+
+    if (isProductAvailable != null) {
+      product = isProductAvailable;
+      emit(
+        state.copyWith(
+          productBarCode: productBarCode,
+          status: ShippingOutStatus.initial,
+        ),
+      );
+    } else {
+      product = isProductAvailable;
+      emit(
+        state.copyWith(
+          failure: Failure(
+            message:
+                "product barcode *$productBarCode* is not available in the stock.",
+          ),
+          status: ShippingOutStatus.error,
+        ),
+      );
+    }
+  }
+
+  void productBarcodeChanged(String productBarCode) async {
+    if (productBarCode.length < 1) {
+      emit(
+        state.copyWith(
+          productBarCode: productBarCode,
+          status: ShippingOutStatus.initial,
+        ),
+      );
+    } else {
+      await searchProduct(productBarCode);
+    }
   }
 
   void quantityChanged(int value) {
     emit(state.copyWith(quantity: value, status: ShippingOutStatus.initial));
+  }
+
+  void reset() {
+    emit(ShippingOutState.initial());
   }
 
   void addTocard() async {
@@ -29,17 +73,9 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
 
     emit(state.copyWith(status: ShippingOutStatus.submitting));
 
-    try {
-      final product = Product(
-        productBarCode: state.productBarCode,
-        quantity: state.quantity,
-      );
-      await _productRepository.addToCart(product: product);
+    if (product != null) {
+      await _productRepository.addProductToCart(product: product);
       emit(state.copyWith(status: ShippingOutStatus.success));
-    } on Failure catch (err) {
-      emit(state.copyWith(
-          status: ShippingOutStatus.error,
-          failure: Failure(message: err.message)));
     }
   }
 }

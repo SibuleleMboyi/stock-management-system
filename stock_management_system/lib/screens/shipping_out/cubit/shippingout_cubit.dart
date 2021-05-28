@@ -7,10 +7,10 @@ import 'package:stock_management_system/repositories/products/product_repository
 part 'shippingout_state.dart';
 
 class ShippingOutCubit extends Cubit<ShippingOutState> {
-  ProductRepository _productRepository;
-  Product product;
+  final ProductRepository _productRepository;
+  //Product product;
   ShippingOutCubit({
-    ProductRepository productRepository,
+    @required ProductRepository productRepository,
   })  : _productRepository = productRepository,
         super(ShippingOutState.initial());
 
@@ -24,15 +24,14 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
     );
 
     if (isProductAvailable != null) {
-      product = isProductAvailable;
       emit(
         state.copyWith(
+          product: isProductAvailable,
           productBarCode: productBarCode,
           status: ShippingOutStatus.initial,
         ),
       );
     } else {
-      product = isProductAvailable;
       emit(
         state.copyWith(
           failure: Failure(
@@ -45,37 +44,66 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
     }
   }
 
-  void productBarcodeChanged(String productBarCode) async {
-    if (productBarCode.length < 1) {
+  void productBarcodeChanged(String value) async {
+    if (value.length == 0) {
       emit(
         state.copyWith(
-          productBarCode: productBarCode,
+          productBarCode: value,
           status: ShippingOutStatus.initial,
         ),
       );
     } else {
-      await searchProduct(productBarCode);
+      await searchProduct(value);
     }
   }
 
   void quantityChanged(int value) {
-    emit(state.copyWith(quantity: value, status: ShippingOutStatus.initial));
+    if (state.product.quantity >= value) {
+      emit(state.copyWith(quantity: value, status: ShippingOutStatus.initial));
+    } else {
+      emit(
+        state.copyWith(
+          failure: Failure(message: 'Quantity exceeded the stock'),
+          status: ShippingOutStatus.error,
+        ),
+      );
+    }
   }
 
-  void reset() {
-    emit(ShippingOutState.initial());
+/*   Future<void> availableProducts() async {
+    List<Product> availableProducts =
+        await _productRepository.availableProducts();
+  } */
+
+  Future<void> productsFromCart() async {
+    List<Product> productsList =
+        await _productRepository.fetchProductsFromCart();
+
+    emit(state.copyWith(productsList: productsList));
   }
 
-  void addTocard() async {
+  void addToCart() async {
     if (!state.isFormValid || state.status == ShippingOutStatus.submitting) {
       return;
     }
 
     emit(state.copyWith(status: ShippingOutStatus.submitting));
 
-    if (product != null) {
+    if (state.product != null) {
+      final product = Product(
+        productBarCode: state.product.productBarCode,
+        productName: state.product.productName,
+        productBrand: state.product.productBrand,
+        price: state.product.price,
+        quantity: state.quantity,
+      );
       await _productRepository.addProductToCart(product: product);
+
       emit(state.copyWith(status: ShippingOutStatus.success));
     }
+  }
+
+  void reset() {
+    emit(ShippingOutState.initial());
   }
 }

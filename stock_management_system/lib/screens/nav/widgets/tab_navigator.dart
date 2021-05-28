@@ -60,6 +60,8 @@ class TabNavigator extends StatelessWidget {
           child: ShippingOutScreen(),
         );
 
+      case BottomNavItem.transactions:
+        return TransactionsScreen();
       default:
         return Scaffold();
     }

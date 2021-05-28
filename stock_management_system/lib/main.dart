@@ -3,10 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stock_management_system/blocs/auth_bloc/bloc/auth_bloc.dart';
-import 'package:stock_management_system/config/custom_router.dart';
-import 'package:stock_management_system/repositories/auth/auth_repository.dart';
-import 'package:stock_management_system/repositories/products/product_repository.dart';
+import 'package:stock_management_system/blocs/blocs.dart';
+import 'package:stock_management_system/config/configs.dart';
+import 'package:stock_management_system/repositories/repositories.dart';
 import 'package:stock_management_system/screens/screens.dart';
 
 void main() async {
@@ -23,6 +22,9 @@ class MyApp extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider<AuthRepository>(create: (_) => AuthRepository()),
+        RepositoryProvider<UserRepository>(create: (_) => UserRepository()),
+        RepositoryProvider<StorageRepository>(
+            create: (_) => StorageRepository()),
         RepositoryProvider<ProductRepository>(
           create: (_) => ProductRepository(),
         ),

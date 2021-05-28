@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stock_management_system/blocs/auth_bloc/bloc/auth_bloc.dart';
+import 'package:stock_management_system/blocs/blocs.dart';
+
 import 'package:stock_management_system/screens/screens.dart';
 
 class SplashScreen extends StatelessWidget {

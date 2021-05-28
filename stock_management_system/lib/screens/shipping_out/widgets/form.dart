@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/helpers/helpers.dart';
+import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
 import 'package:stock_management_system/widgets/widgets.dart';
 
@@ -43,6 +44,7 @@ class _FormWidgetState extends State<FormWidget> {
         }
       },
       builder: (context, state) {
+        context.read<ShippingOutCubit>().productsFromCart();
         return Form(
           key: _formkey,
           child: Column(
@@ -87,18 +89,46 @@ class _FormWidgetState extends State<FormWidget> {
                 ],
               ),
               SizedBox(height: 16.0),
-              TextFormField(
-                decoration: InputDecoration(
-                  labelText: 'Quantity',
-                  //errorText: '*Required',
-                ),
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                onChanged: (value) => context
-                    .read<ShippingOutCubit>()
-                    .quantityChanged(num.tryParse(value)),
-                validator: (value) =>
-                    value.isEmpty ? "enter the product's quantity" : null,
+              Stack(
+                children: [
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: 'Quantity',
+                      //errorText: '*Required',
+                    ),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    onChanged: (value) => context
+                        .read<ShippingOutCubit>()
+                        .quantityChanged(num.tryParse(value)),
+                    validator: (value) =>
+                        value.isEmpty ? "enter the product's quantity" : null,
+                  ),
+                  Positioned(
+                    top: 15.0,
+                    right: 18.0,
+                    child: Column(children: [
+                      Text(
+                        'Current Stock :',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 10.0,
+                        ),
+                      ),
+                      state.productBarCode != null
+                          ? Text(
+                              state.product.quantity.toString(),
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                                fontSize: 10.0,
+                              ),
+                            )
+                          : SizedBox.shrink(),
+                    ]),
+                  ),
+                ],
               ),
               const SizedBox(height: 28.0),
               ElevatedButton(
@@ -112,6 +142,17 @@ class _FormWidgetState extends State<FormWidget> {
                   state.status == ShippingOutStatus.submitting,
                 ),
                 child: Text('add to cart'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  onPrimary: Colors.white,
+                  shadowColor: Colors.grey,
+                ),
+                child:
+                    Text('cart (' + state.productsList.length.toString() + ')'),
+                onPressed: () =>
+                    Navigator.of(context).pushNamed(CartScreen.routeName),
               ),
             ],
           ),
@@ -128,7 +169,7 @@ class _FormWidgetState extends State<FormWidget> {
 
   void _submitForm(BuildContext context, bool isSubmitting) {
     if (_formkey.currentState.validate() && !isSubmitting) {
-      context.read<ShippingOutCubit>().addTocard();
+      context.read<ShippingOutCubit>().addToCart();
     }
   }
 }

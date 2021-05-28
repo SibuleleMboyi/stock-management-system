@@ -9,7 +9,7 @@ part 'shipping_in_state.dart';
 class ShippingInCubit extends Cubit<ShippingInState> {
   final ProductRepository _productRepository;
 
-  ShippingInCubit({ProductRepository productRepository})
+  ShippingInCubit({@required ProductRepository productRepository})
       : _productRepository = productRepository,
         super(ShippingInState.initial());
 

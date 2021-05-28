@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/repositories/products/product_repository.dart';
-import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
 import 'package:stock_management_system/screens/shipping_out/widgets/form.dart';
 
@@ -36,7 +35,7 @@ class ShippingOutScreen extends StatelessWidget {
                 child: FormWidget(),
               ),
             ),
-            ElevatedButton(
+            /* ElevatedButton(
               style: ElevatedButton.styleFrom(
                 primary: Theme.of(context).primaryColor,
                 onPrimary: Colors.white,
@@ -45,7 +44,7 @@ class ShippingOutScreen extends StatelessWidget {
               child: Text('cart'),
               onPressed: () =>
                   Navigator.of(context).pushNamed(CartScreen.routeName),
-            ),
+            ), */
           ],
         ),
       ),

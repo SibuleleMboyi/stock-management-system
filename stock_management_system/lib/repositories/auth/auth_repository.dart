@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:stock_management_system/config/paths.dart';
+import 'package:stock_management_system/config/configs.dart';
 import 'package:stock_management_system/models/models.dart';
 import 'package:stock_management_system/repositories/auth/base_auth_repository.dart';
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stock_management_system/config/paths.dart';
+import 'package:stock_management_system/config/configs.dart';
+import 'package:stock_management_system/helpers/helpers.dart';
 import 'package:stock_management_system/models/models.dart';
 import 'package:stock_management_system/repositories/products/base_products_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,6 +28,16 @@ class ProductRepository extends BaseProductRepository {
       return Product.fromDocument(doc);
     }
     return null;
+  }
+
+  Future<List<Product>> availableProducts() async {
+    final productsSnapShot =
+        await _firebaseFirestore.collection(Paths.products).get();
+
+    final productsList =
+        productsSnapShot.docs.map((doc) => Product.fromDocument(doc)).toList();
+
+    return productsList;
   }
 
   /// This methods adds a new stock product into Firebase Firestore database.
@@ -61,10 +72,21 @@ class ProductRepository extends BaseProductRepository {
 
   @override
   Future<void> addProductToCart({@required Product product}) async {
-    await _firebaseFirestore
+    final doc = await _firebaseFirestore
         .collection(Paths.cart)
         .doc(product.productBarCode)
-        .set(product.toDocument());
+        .get();
+    if (doc.exists) {
+      await _firebaseFirestore
+          .collection(Paths.cart)
+          .doc(product.productBarCode)
+          .update({'quantity': product.quantity + doc['quantity']});
+    } else {
+      await _firebaseFirestore
+          .collection(Paths.cart)
+          .doc(product.productBarCode)
+          .set(product.toDocument());
+    }
   }
 
   @override
@@ -75,24 +97,60 @@ class ProductRepository extends BaseProductRepository {
         .delete();
   }
 
+  /// Returns a list of cart products
+  Future<List<Product>> fetchProductsFromCart() async {
+    final cartProductsSnapshot =
+        await _firebaseFirestore.collection(Paths.cart).get();
+    return cartProductsSnapshot.docs
+        .map((doc) => Product.fromDocument(doc))
+        .toList();
+  }
+
   /// This methods fetches all the products that are available in the cart.
-  /// Loops at each product item, adds it to the collection of the bought items.
+  /// Loops at each product item, checks if it already exists in the sold items,
+  /// if yes, updates the 'quantity', the number of times this item has been bought.
+  /// Otherwise it adds this
+  ///  adds it to the collection of the bought items.
   /// The delete all the items that were in the cart, leaving the cart empty for a new transaction.
   @override
   Future<void> buyProducts(
-      {@required transactionDate, @required String cashierId}) async {
+      {@required String transactionDate, @required String cashierId}) async {
+    String date = Formats.dateFormat();
     final productsSnapshot =
         await _firebaseFirestore.collection(Paths.cart).get();
 
-    // adds products from the cart collection into the bought items collection.
-    productsSnapshot.docs.map((doc) => _firebaseFirestore
-        .collection(Paths.purchased_products)
-        .doc(cashierId)
-        .collection(Paths.transactions)
-        .add(doc.data()));
+    // adds products from the cart collection into the sold items collection.
+    productsSnapshot.docs.forEach((doc) async {
+      final docSnapshot = await _firebaseFirestore
+          .collection(Paths.purchased_products)
+          .doc(cashierId)
+          .collection(date)
+          .doc(doc.id)
+          .get();
 
-    // iterates through the returned query snapshot,
-    // and deletes each document
-    productsSnapshot.docs.map((doc) => doc.reference.delete());
+      if (docSnapshot.exists) {
+        _firebaseFirestore
+            .collection(Paths.purchased_products)
+            .doc(cashierId)
+            .collection(date)
+            .doc(doc.id)
+            .update(
+                {'quantity': docSnapshot.data()['quantity'] + doc['quantity']});
+      } else {
+        _firebaseFirestore
+            .collection(Paths.purchased_products)
+            .doc(cashierId)
+            .collection(date)
+            .doc(doc.id)
+            .set(doc.data());
+      }
+
+      // deletes this document from the cart
+      doc.reference.delete();
+    });
+
+    // iterates through the cart snapshot,
+    // and deletes each cart product
+    //productsSnapshot.docs.forEach((doc) => doc.reference.delete());
   }
 }

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 
 class Product extends Equatable {
   final String id;
@@ -11,11 +12,11 @@ class Product extends Equatable {
 
   Product({
     this.id,
-    this.productBarCode,
-    this.productName,
-    this.productBrand,
-    this.quantity,
-    this.price,
+    @required this.productBarCode,
+    @required this.productName,
+    @required this.productBrand,
+    @required this.quantity,
+    @required this.price,
   });
 
   @override

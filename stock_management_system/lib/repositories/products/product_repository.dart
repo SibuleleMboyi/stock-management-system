@@ -153,4 +153,12 @@ class ProductRepository extends BaseProductRepository {
     // and deletes each cart product
     //productsSnapshot.docs.forEach((doc) => doc.reference.delete());
   }
+
+  @override
+  Future<int> getInvoiceNumber() async {
+    final invoicesLength =
+        await _firebaseFirestore.collection(Paths.invoices).get();
+
+    return invoicesLength.size + 1;
+  }
 }

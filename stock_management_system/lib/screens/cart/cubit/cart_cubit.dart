@@ -51,38 +51,21 @@ class CartCubit extends Cubit<CartState> {
       transactionDate: 'transactionDate',
       cashierId: cashierId,
     );
-    final invoice = Invoice(items: [
-      Product(
-        productBarCode: '000000000',
-        productName: 'Java',
-        productBrand: 'IDE',
-        quantity: 5,
-        price: 10,
-      ),
-      Product(
-        productBarCode: '0098730000',
-        productName: 'Java',
-        productBrand: 'IDE',
-        quantity: 5,
-        price: 7,
-      ),
-      Product(
-        productBarCode: '123400000',
-        productName: 'Green',
-        productBrand: 'Salad',
-        quantity: 5,
-        price: 1,
-      ),
-      Product(
-        productBarCode: '000232000',
-        productName: 'Olive',
-        productBrand: 'Light',
-        quantity: 5,
-        price: 2,
-      ),
-    ]);
+
+    final int invoiceNumber = await _productRepository.getInvoiceNumber();
+
+    final invoice = Invoice(
+      invoiceNumber: invoiceNumber.toString(),
+      date: Formats.dateFormat(),
+      author: cashierId,
+      items: state.productsList,
+    );
     final pdfFile = await InvoiceDocument.generateDocument(invoice: invoice);
-    await _storageRepository.uploadPdfToDatabase(pdf: pdfFile);
+    await _storageRepository.uploadPdfToDatabase(
+      pdf: pdfFile,
+      invoice: invoice,
+    );
+
     await EmailSender.sendEmail(pdfFilePath: SavePdf.filePath());
 
     signedInUser();

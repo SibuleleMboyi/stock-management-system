@@ -101,25 +101,19 @@ class InvoiceDocument {
   static Widget buildTitle({@required Invoice invoice}) {
     return Column(children: [
       Text(
-        'INVOICE',
-        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        'TRANSACTION',
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
-      SizedBox(height: 0.8 * PdfPageFormat.cm),
-      // TODO :: Take care of this
-      //Text(invoice.info.description),
-      // SizedBox(height: 0.8 * PdfPageFormat.cm),
+      SizedBox(height: 0.5 * PdfPageFormat.cm),
+      Text('Transaction Number: ' + invoice.invoiceNumber),
+      SizedBox(height: 0.2 * PdfPageFormat.cm),
+      Text('Transaction Date: ' + invoice.date),
+      SizedBox(height: 0.2 * PdfPageFormat.cm),
     ]);
   }
 
   static Widget buildInvoice({@required Invoice invoice}) {
-    final headers = [
-      'Description',
-      'Date',
-      'Quantity',
-      'Unit Price',
-      'VAT',
-      'Total'
-    ];
+    final headers = ['Description', 'Quantity', 'Unit Price', 'VAT', 'Total'];
 
     //TODO :: Each product must have it's own 'vat' Edit Product model
     //final total = item.unitPrice * item.quantity * (1 + item.vat);
@@ -129,11 +123,11 @@ class InvoiceDocument {
       final vat = 0.21;
       return [
         item.productName,
-        Formats.dateFormat(),
+        //Formats.dateFormat(),
         '${item.quantity}',
-        '\$ ${item.price}',
+        '\R ${item.price}',
         '$vat %',
-        '\$ ${total.toStringAsFixed(2)}',
+        '\R ${total.toStringAsFixed(2)}',
       ];
     }).toList();
 
@@ -160,7 +154,7 @@ class InvoiceDocument {
         .map((item) => item.price * item.quantity)
         .reduce((item1, item2) => item1 + item2);
     // TODO : Perform these accounting calculations
-    final vatPercent = 20.0;
+    final vatPercent = 1.0;
     final vat = netTotal * vatPercent;
     final total = netTotal + vat;
 

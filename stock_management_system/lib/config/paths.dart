@@ -4,6 +4,7 @@ class Paths {
   static const String products = "available-stock";
   static const String cart = "cart";
   static const String purchased_products = "sold-stock";
+  static const String invoices = "invoices";
 
   // Sub Collections
   static const String transactions = "transactions";

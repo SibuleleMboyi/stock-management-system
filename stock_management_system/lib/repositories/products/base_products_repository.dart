@@ -7,4 +7,5 @@ abstract class BaseProductRepository {
   Future<void> addProductToCart();
   Future<void> removeFromCart();
   Future<void> buyProducts();
+  Future<int> getInvoiceNumber();
 }

@@ -106,6 +106,14 @@ class ProductRepository extends BaseProductRepository {
         .toList();
   }
 
+  Future<List<Transaction_>> fetchTransactions() async {
+    final transactionsSnapshot =
+        await _firebaseFirestore.collection(Paths.transactions).get();
+    return transactionsSnapshot.docs
+        .map((doc) => Transaction_.fromDocument(doc))
+        .toList();
+  }
+
   /// This methods fetches all the products that are available in the cart.
   /// Loops at each product item, checks if it already exists in the sold items,
   /// if yes, updates the 'quantity', the number of times this item has been bought.
@@ -113,14 +121,20 @@ class ProductRepository extends BaseProductRepository {
   ///  adds it to the collection of the bought items.
   /// The delete all the items that were in the cart, leaving the cart empty for a new transaction.
   @override
-  Future<void> buyProducts(
-      {@required String transactionDate, @required String cashierId}) async {
+  Future<void> buyProducts({@required String cashierId}) async {
     String date = Formats.dateFormat();
-    final productsSnapshot =
-        await _firebaseFirestore.collection(Paths.cart).get();
+    final cartSnapshot = await _firebaseFirestore.collection(Paths.cart).get();
+
+    //final available_stock = _firebaseFirestore.collection(Paths.products).
 
     // adds products from the cart collection into the sold items collection.
-    productsSnapshot.docs.forEach((doc) async {
+    cartSnapshot.docs.forEach((doc) async {
+      final productSnapshot =
+          await _firebaseFirestore.collection(Paths.products).doc(doc.id).get();
+
+      _firebaseFirestore.collection(Paths.products).doc(doc.id).update(
+          {'quantity': productSnapshot.data()['quantity'] - doc['quantity']});
+
       final docSnapshot = await _firebaseFirestore
           .collection(Paths.purchased_products)
           .doc(cashierId)
@@ -157,7 +171,7 @@ class ProductRepository extends BaseProductRepository {
   @override
   Future<int> getInvoiceNumber() async {
     final invoicesLength =
-        await _firebaseFirestore.collection(Paths.invoices).get();
+        await _firebaseFirestore.collection(Paths.transactions).get();
 
     return invoicesLength.size + 1;
   }

@@ -42,33 +42,43 @@ class CartCubit extends Cubit<CartState> {
   Future<void> signedInUser() async {
     final userId = _authBloc.state.user.uid;
     final user = await _userRepository.getUserWithId(userId: userId);
-    //print('userId : ' + userId);
     emit(state.copyWith(user: user));
   }
 
-  Future<void> submitOrder({@required String cashierId}) async {
-    await _productRepository.buyProducts(
-      transactionDate: 'transactionDate',
-      cashierId: cashierId,
-    );
+  Future<void> submitOrder() async {
+    emit(state.copyWith(status: CartStatus.submitting));
+    try {
+      await signedInUser();
 
-    final int invoiceNumber = await _productRepository.getInvoiceNumber();
+      final int transactionNumber = await _productRepository.getInvoiceNumber();
 
-    final invoice = Invoice(
-      invoiceNumber: invoiceNumber.toString(),
-      date: Formats.dateFormat(),
-      author: cashierId,
-      items: state.productsList,
-    );
-    final pdfFile = await InvoiceDocument.generateDocument(invoice: invoice);
-    await _storageRepository.uploadPdfToDatabase(
-      pdf: pdfFile,
-      invoice: invoice,
-    );
+      final transaction = Transaction_(
+        transactionNumber: transactionNumber.toString(),
+        date: Formats.dateFormat(),
+        author: 'users/' + state.user.id,
+        items: state.productsList,
+      );
+      final pdfFile = await InvoiceDocument.generateDocument(
+        transaction: transaction,
+        user: state.user,
+      );
 
-    await EmailSender.sendEmail(pdfFilePath: SavePdf.filePath());
+      await _productRepository.buyProducts(
+        cashierId: state.user.id,
+      );
 
-    signedInUser();
+      await _storageRepository.uploadPdfToDatabase(
+        pdf: pdfFile,
+        transaction: transaction,
+      );
+
+      await EmailSender.sendEmail(pdfFilePath: SavePdf.filePath());
+      emit(state.copyWith(status: CartStatus.success));
+    } on Failure catch (err) {
+      emit(state.copyWith(
+          status: CartStatus.error,
+          failure: Failure(message: err.message, code: err.code)));
+    }
   }
 
   void reset() {

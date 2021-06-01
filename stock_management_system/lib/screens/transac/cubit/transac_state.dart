@@ -1,15 +1,15 @@
-part of 'transaction_cubit.dart';
+part of 'transac_cubit.dart';
 
-enum TransactionStatus { initial, loading, success, error }
+enum TransacStatus { initial, loading, success, error }
 
 @immutable
-class TransactionState extends Equatable {
+class TransacState extends Equatable {
   final List<Transaction_> transactionsList;
   final List<File> pdfs;
-  final TransactionStatus status;
+  final TransacStatus status;
   final Failure failure;
 
-  TransactionState({
+  TransacState({
     @required this.transactionsList,
     @required this.pdfs,
     @required this.status,
@@ -17,24 +17,24 @@ class TransactionState extends Equatable {
   });
 
   @override
-  List<Object> get props => [transactionsList, pdfs, failure, status];
+  List<Object> get props => [transactionsList, pdfs, status, failure];
 
-  factory TransactionState.initial() {
-    return TransactionState(
+  factory TransacState.initial() {
+    return TransacState(
       transactionsList: [],
       pdfs: [],
-      status: TransactionStatus.initial,
+      status: TransacStatus.initial,
       failure: Failure(),
     );
   }
 
-  TransactionState copyWith({
+  TransacState copyWith({
     List<Transaction_> transactionsList,
     List<File> pdfs,
-    TransactionStatus status,
+    TransacStatus status,
     Failure failure,
   }) {
-    return TransactionState(
+    return TransacState(
       transactionsList: transactionsList ?? this.transactionsList,
       pdfs: pdfs ?? this.pdfs,
       status: status ?? this.status,

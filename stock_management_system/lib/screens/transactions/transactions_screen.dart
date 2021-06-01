@@ -1,62 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:stock_management_system/helpers/helpers.dart';
-import 'package:stock_management_system/helpers/pdf_save_helper.dart';
-import 'package:stock_management_system/models/models.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:stock_management_system/screens/transactions/cubit/transaction_cubit.dart';
 
 /// Contains historical transactions that can be filtered according to the user preferences
 
 class TransactionsScreen extends StatelessWidget {
   static const String routeName = '/transactions';
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text('PDF View')),
-      ),
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        child: Column(children: [
-          TextButton(
-            child: Center(child: Text('Invoice PDF')),
-            onPressed: () async {
-              final invoice = Invoice(items: [
-                Product(
-                  productBarCode: '000000000',
-                  productName: 'Java',
-                  productBrand: 'IDE',
-                  quantity: 5,
-                  price: 10,
-                ),
-                Product(
-                  productBarCode: '0098730000',
-                  productName: 'Java',
-                  productBrand: 'IDE',
-                  quantity: 5,
-                  price: 7,
-                ),
-                Product(
-                  productBarCode: '123400000',
-                  productName: 'Green',
-                  productBrand: 'Salad',
-                  quantity: 5,
-                  price: 1,
-                ),
-                Product(
-                  productBarCode: '000232000',
-                  productName: 'Olive',
-                  productBrand: 'Light',
-                  quantity: 5,
-                  price: 2,
-                ),
-              ]);
-              final pdfFile =
-                  await InvoiceDocument.generateDocument(invoice: invoice);
-              SavePdf.openFile(file: pdfFile);
-            },
-          )
-        ]),
-      ),
+    return BlocConsumer<TransactionCubit, TransactionState>(
+      listener: (context, state) {
+        print(context.read<TransactionCubit>().transactionPdfs());
+
+        if (state.status == TransactionStatus.error) {
+          context.read<TransactionCubit>().reset();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 3),
+              content: Text(state.failure.message),
+            ),
+          );
+        } else if (state.status == TransactionStatus.success) {
+          print(state.transactionsList);
+          print('I am tired!');
+        }
+      },
+      builder: (context, state) {
+        // context.read<TransactionCubit>().transactionPdfs();
+        print(state.transactionsList[2].transactionNumber);
+        print('transactionsList lenght: ' +
+            state.transactionsList.length.toString());
+        return Scaffold(
+          appBar: AppBar(
+            title: Center(child: Text('PDF View')),
+          ),
+          body:
+              /* PDFView(
+              filePath: state.transactionsList[0].transactionPdfUrl,
+            ) */
+              Center(
+                  child: state.status == TransactionStatus.initial
+                      ? const CircularProgressIndicator()
+                      : Text(state.transactionsList[0].transactionPdfUrl)),
+        );
+      },
     );
   }
 }

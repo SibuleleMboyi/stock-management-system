@@ -17,10 +17,9 @@ class EmailSender {
       ..toString()
       ..from = Address(senderUsername, senderName)
       ..recipients.add(receiverUsername)
-      ..subject = 'Invoice'
+      ..subject = 'TRANSACTION'
       ..text = '- New Transaction.'
-      ..html =
-          '<p>Please find the attachment of the Invoice for the new transaction</p>'
+      ..html = '<p>Please find the attachment of the new transaction</p>'
       ..attachments = [
         FileAttachment(File(pdfFilePath))
           ..location = Location.inline

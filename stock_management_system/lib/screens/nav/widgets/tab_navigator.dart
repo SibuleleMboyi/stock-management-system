@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/config/custom_router.dart';
 import 'package:stock_management_system/repositories/products/product_repository.dart';
+import 'package:stock_management_system/repositories/repositories.dart';
 import 'package:stock_management_system/screens/nav/enums/enums.dart';
 import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
+import 'package:stock_management_system/screens/transac/cubit/transac_cubit.dart';
+import 'package:stock_management_system/screens/transac/transac.dart';
+import 'package:stock_management_system/screens/transactions/cubit/transaction_cubit.dart';
 
 class TabNavigator extends StatelessWidget {
   static const String tabNavigatorRoot = '/';
@@ -56,12 +60,27 @@ class TabNavigator extends StatelessWidget {
       case BottomNavItem.shippingOut:
         return BlocProvider<ShippingOutCubit>(
           create: (_) => ShippingOutCubit(
-              productRepository: context.read<ProductRepository>()),
+            productRepository: context.read<ProductRepository>(),
+          ),
           child: ShippingOutScreen(),
         );
 
+/*       case BottomNavItem.transactions:
+        return BlocProvider(
+          create: (context) => TransactionCubit(
+            productRepository: context.read<ProductRepository>(),
+            storageRepository: context.read<StorageRepository>(),
+          ),
+          child: TransactionsScreen(),
+        ); */
+
       case BottomNavItem.transactions:
-        return TransactionsScreen();
+        return BlocProvider(
+          create: (context) => TransacCubit(
+            productRepository: context.read<ProductRepository>(),
+          ),
+          child: Transac(),
+        );
       default:
         return Scaffold();
     }

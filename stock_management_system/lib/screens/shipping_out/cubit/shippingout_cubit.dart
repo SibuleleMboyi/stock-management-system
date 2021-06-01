@@ -44,16 +44,11 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
     }
   }
 
-  void productBarcodeChanged(String value) async {
-    if (value.length == 0) {
-      emit(
-        state.copyWith(
-          productBarCode: value,
-          status: ShippingOutStatus.initial,
-        ),
-      );
+  void productBarcodeChanged(String productBarCode) async {
+    if (productBarCode.length <= 1 || productBarCode == '-1') {
+      return;
     } else {
-      await searchProduct(value);
+      await searchProduct(productBarCode);
     }
   }
 
@@ -89,17 +84,23 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
 
     emit(state.copyWith(status: ShippingOutStatus.submitting));
 
-    if (state.product != null) {
-      final product = Product(
-        productBarCode: state.product.productBarCode,
-        productName: state.product.productName,
-        productBrand: state.product.productBrand,
-        price: state.product.price,
-        quantity: state.quantity,
-      );
-      await _productRepository.addProductToCart(product: product);
+    try {
+      if (state.product != null) {
+        final product = Product(
+          productBarCode: state.product.productBarCode,
+          productName: state.product.productName,
+          productBrand: state.product.productBrand,
+          price: state.product.price,
+          quantity: state.quantity,
+        );
+        await _productRepository.addProductToCart(product: product);
 
-      emit(state.copyWith(status: ShippingOutStatus.success));
+        emit(state.copyWith(status: ShippingOutStatus.success));
+      }
+    } on Failure catch (err) {
+      emit(state.copyWith(
+          status: ShippingOutStatus.error,
+          failure: Failure(message: err.message)));
     }
   }
 

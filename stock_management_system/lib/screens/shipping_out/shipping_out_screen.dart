@@ -26,26 +26,12 @@ class ShippingOutScreen extends StatelessWidget {
         title: Center(child: Text('Sell Stock')),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Card(
-              color: Colors.white,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
-                child: FormWidget(),
-              ),
-            ),
-            /* ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: Theme.of(context).primaryColor,
-                onPrimary: Colors.white,
-                shadowColor: Colors.grey,
-              ),
-              child: Text('cart'),
-              onPressed: () =>
-                  Navigator.of(context).pushNamed(CartScreen.routeName),
-            ), */
-          ],
+        child: Card(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
+            child: FormWidget(),
+          ),
         ),
       ),
     );

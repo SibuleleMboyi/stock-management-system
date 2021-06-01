@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:stock_management_system/config/configs.dart';
+import 'package:stock_management_system/helpers/helpers.dart';
 import 'package:stock_management_system/models/models.dart';
 import 'package:stock_management_system/repositories/storage/base_repository.dart';
 
@@ -19,25 +20,33 @@ class StorageRepository extends BaseStorageRepository {
 
   @override
   Future<String> uploadPdfToDatabase(
-      {@required File pdf, @required Invoice invoice}) async {
+      {@required File pdf, @required Transaction_ transaction}) async {
     final downloadUrl = await _firebaseStorage
-        .ref('invoices/' +
-            invoice.invoiceNumber +
-            '.pdf') //TODO: store invoice by Invoice Number
+        .ref('invoices/' + transaction.transactionNumber + '.pdf')
         .putFile(pdf)
         .then((taskSnapshot) => taskSnapshot.ref.getDownloadURL());
 
-    final invoiceDocument = Invoice(
-      invoiceNumber: invoice.invoiceNumber,
-      date: invoice.date,
-      author: invoice.author,
-      invoicePdfUrl: downloadUrl,
+    final invoiceDocument = Transaction_(
+      transactionNumber: transaction.transactionNumber,
+      date: transaction.date,
+      author: transaction.author,
+      transactionPdfUrl: downloadUrl,
     );
     await _firebaseFirestore
-        .collection(Paths.invoices)
-        .doc(invoiceDocument.invoiceNumber)
+        .collection(Paths.transactions)
+        .doc(invoiceDocument.transactionNumber)
         .set(invoiceDocument.toDocoment());
 
     return downloadUrl;
+  }
+
+  @override
+  Future<File> pdfs({@required Transaction_ transaction}) async {
+    final refPDF = _firebaseStorage.ref('invoices/').child('11.pdf');
+    final bytes = await refPDF.getData();
+    return PdfDownload.storeFile(
+      transaction: transaction,
+      bytes: bytes,
+    );
   }
 }

@@ -49,6 +49,8 @@ class _FormWidgetState extends State<FormWidget> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              if (state.status == ShippingInStatus.submitting)
+                const LinearProgressIndicator(),
               Stack(
                 children: [
                   TextFormField(

@@ -8,117 +8,53 @@ import 'package:stock_management_system/helpers/pdf_save_helper.dart';
 import 'package:stock_management_system/models/models.dart';
 
 class InvoiceDocument {
-  static Future<File> generateDocument({@required Invoice invoice}) async {
+  static Future<File> generateDocument(
+      {@required Transaction_ transaction, @required User user}) async {
     final document = Document();
     document.addPage(MultiPage(
         build: (context) => [
-              buildTitle(invoice: invoice),
-              buildInvoice(invoice: invoice),
+              buildTitle(transaction: transaction, user: user),
+              buildInvoice(transaction: transaction),
               Divider(),
-              buildTotal(invoice: invoice),
+              buildTotal(transaction: transaction),
             ]));
 
     return SavePdf.savePdfToLocalStorage(
-        name: 'my_pdf_invoice.pdf', document: document);
+        name: 'transaction.pdf', document: document);
   }
 
-  /* Widget buildHeader({@required Invoice invoice}) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 1 * PdfPageFormat.cm),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              buildSupplierAddress(invoice.supplier),
-              Container(
-                height: 50,
-                width: 50,
-                child: BarcodeWidget(
-                  barcode: Barcode.qrCode(),
-                  data: invoice.info.number,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 1 * PdfPageFormat.cm),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              buildCustomerAddress(invoice.customer),
-              buildInvoiceInfo(invoice.info),
-            ],
-          ),
-        ],
-      );
-
-  Widget buildInvoiceInfo(InvoiceInfo info) {
-    final paymentTerms = '${info.dueDate.difference(info.date).inDays} days';
-    final titles = <String>[
-      'Invoice Number:',
-      'Invoice Date:',
-      'Payment Terms:',
-      'Due Date:'
-    ];
-
-    /// TODO:: Change this data accordingly
-    final data = <String>[
-      info.number,
-      Formats.dateFormat(),
-      paymentTerms,
-      Formats.dateFormat(),
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: List.generate(titles.length, (index) {
-        final title = titles[index];
-        final value = data[index];
-
-        return buildText(title: title, value: value, width: 200);
-      }),
-    );
-  }
-
-  Widget buildCustomerAddress(Customer customer) {
+  static Widget buildTitle(
+      {@required Transaction_ transaction, @required User user}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(customer.name, style: TextStyle(fontWeight: FontWeight.bold)),
-        Text(customer.address),
+        Text(
+          'TRANSACTION',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 0.5 * PdfPageFormat.cm),
+        Row(children: [
+          Text('Teller: ' + user.username),
+          SizedBox(width: 0.3 * PdfPageFormat.cm),
+          Text('(' + user.email + ')'),
+        ]),
+        SizedBox(height: 0.2 * PdfPageFormat.cm),
+        Text('Transaction Number: ' + transaction.transactionNumber),
+        SizedBox(height: 0.2 * PdfPageFormat.cm),
+        Text('Transaction Date: ' + transaction.date),
+        SizedBox(height: 0.2 * PdfPageFormat.cm),
+        SizedBox(height: 0.2 * PdfPageFormat.cm),
       ],
     );
   }
 
-  Widget buildSupplierAddress(Supplier supplier) {
-    return Column(children: [
-      Text(supplier.name, style: TextStyle(fontWeight: FontWeight.bold)),
-      SizedBox(height: 1 * PdfPageFormat.mm),
-      Text(supplier.address),
-    ]);
-  }
- */
-  static Widget buildTitle({@required Invoice invoice}) {
-    return Column(children: [
-      Text(
-        'TRANSACTION',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-      ),
-      SizedBox(height: 0.5 * PdfPageFormat.cm),
-      Text('Transaction Number: ' + invoice.invoiceNumber),
-      SizedBox(height: 0.2 * PdfPageFormat.cm),
-      Text('Transaction Date: ' + invoice.date),
-      SizedBox(height: 0.2 * PdfPageFormat.cm),
-    ]);
-  }
-
-  static Widget buildInvoice({@required Invoice invoice}) {
+  static Widget buildInvoice({@required Transaction_ transaction}) {
     final headers = ['Description', 'Quantity', 'Unit Price', 'VAT', 'Total'];
 
     //TODO :: Each product must have it's own 'vat' Edit Product model
     //final total = item.unitPrice * item.quantity * (1 + item.vat);
 
-    final data = invoice.items.map((item) {
+    final data = transaction.items.map((item) {
       final total = item.price * item.quantity * (1 + 0.2);
       final vat = 0.21;
       return [
@@ -149,8 +85,8 @@ class InvoiceDocument {
     );
   }
 
-  static Widget buildTotal({@required Invoice invoice}) {
-    final netTotal = invoice.items
+  static Widget buildTotal({@required Transaction_ transaction}) {
+    final netTotal = transaction.items
         .map((item) => item.price * item.quantity)
         .reduce((item1, item2) => item1 + item2);
     // TODO : Perform these accounting calculations

@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:stock_management_system/config/configs.dart';
-import 'package:stock_management_system/helpers/helpers.dart';
 import 'package:stock_management_system/models/models.dart';
 import 'package:stock_management_system/repositories/storage/base_repository.dart';
 
@@ -38,15 +37,5 @@ class StorageRepository extends BaseStorageRepository {
         .set(invoiceDocument.toDocoment());
 
     return downloadUrl;
-  }
-
-  @override
-  Future<File> pdfs({@required Transaction_ transaction}) async {
-    final refPDF = _firebaseStorage.ref('invoices/').child('11.pdf');
-    final bytes = await refPDF.getData();
-    return PdfDownload.storeFile(
-      transaction: transaction,
-      bytes: bytes,
-    );
   }
 }

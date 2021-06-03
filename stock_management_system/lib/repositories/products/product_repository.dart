@@ -107,8 +107,13 @@ class ProductRepository extends BaseProductRepository {
   }
 
   Future<List<Transaction_>> fetchTransactions() async {
-    final transactionsSnapshot =
-        await _firebaseFirestore.collection(Paths.transactions).get();
+    final transactionsSnapshot = await _firebaseFirestore
+        .collection(Paths.transactions)
+        .orderBy(
+          'date',
+          descending: false,
+        )
+        .get();
     return transactionsSnapshot.docs
         .map((doc) => Transaction_.fromDocument(doc))
         .toList();
@@ -162,10 +167,6 @@ class ProductRepository extends BaseProductRepository {
       // deletes this document from the cart
       doc.reference.delete();
     });
-
-    // iterates through the cart snapshot,
-    // and deletes each cart product
-    //productsSnapshot.docs.forEach((doc) => doc.reference.delete());
   }
 
   @override

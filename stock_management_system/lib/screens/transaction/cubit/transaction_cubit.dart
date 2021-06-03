@@ -10,54 +10,43 @@ part 'transaction_state.dart';
 
 class TransactionCubit extends Cubit<TransactionState> {
   final ProductRepository _productRepository;
-  final StorageRepository _storageRepository;
 
   TransactionCubit({
     @required ProductRepository productRepository,
-    @required StorageRepository storageRepository,
   })  : _productRepository = productRepository,
-        _storageRepository = storageRepository,
         super(TransactionState.initial());
 
-  void productsList() async {
+  void transactionsList() async {
+    if (state.status == TransactionStatus.success) return;
+    emit(state.copyWith(status: TransactionStatus.loading));
+
     try {
       final transactions = await _productRepository.fetchTransactions();
-      //print(transactions);
+      final dates =
+          transactions.map((transaction) => transaction.date).toSet().toList();
+      //productsSubList(transactions: transactions);
       emit(state.copyWith(
         status: TransactionStatus.success,
         transactionsList: transactions,
+        uniqueDates: dates,
       ));
-    } on Failure catch (err) {
-      emit(
-        state.copyWith(
+      print(dates);
+    } catch (err) {
+      state.copyWith(
           status: TransactionStatus.error,
-          failure: Failure(message: err.message),
-        ),
-      );
-      //print(err);
+          failure: const Failure(message: 'We are unable to load your feed.'));
     }
+
+    //print(state.transactionsList[0].transactionPdfUrl);
   }
 
-  Future<void> transactionPdfs() async {
-    return await _productRepository.fetchTransactions();
+  List<Transaction_> transactionsSubList({@required String uniqueDate}) {
+    final list = state.transactionsList
+        .where((transaction) => transaction.date == uniqueDate)
+        .toList();
+
+    return list;
   }
-
-/*   Future<void> transactionPdfs() async {
-    // TODO :: create a list and assign it to 'pdfs' list
-
-    List<File> files;
-    state.transactionsList.forEach((transaction) async {
-      final pdfFile = await _storageRepository.pdfs(transaction: transaction);
-      files.add(pdfFile);
-    }); 
-
-    emit(state.copyWith(
-      pdfs: files,
-      status: TransactionStatus.success,
-    ));
-
-    //return ;
-  }*/
 
   void reset() => emit(TransactionState.initial());
 }

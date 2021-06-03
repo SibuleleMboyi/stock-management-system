@@ -7,9 +7,7 @@ import 'package:stock_management_system/screens/nav/enums/enums.dart';
 import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
-import 'package:stock_management_system/screens/transac/cubit/transac_cubit.dart';
-import 'package:stock_management_system/screens/transac/transac.dart';
-import 'package:stock_management_system/screens/transactions/cubit/transaction_cubit.dart';
+import 'package:stock_management_system/screens/transaction/cubit/transaction_cubit.dart';
 
 class TabNavigator extends StatelessWidget {
   static const String tabNavigatorRoot = '/';
@@ -76,11 +74,12 @@ class TabNavigator extends StatelessWidget {
 
       case BottomNavItem.transactions:
         return BlocProvider(
-          create: (context) => TransacCubit(
+          create: (context) => TransactionCubit(
             productRepository: context.read<ProductRepository>(),
           ),
-          child: Transac(),
+          child: TransactionScreen(),
         );
+
       default:
         return Scaffold();
     }

@@ -21,16 +21,19 @@ class ShippingOutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text('Sell Stock')),
-      ),
-      body: SingleChildScrollView(
-        child: Card(
-          color: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
-            child: FormWidget(),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        appBar: AppBar(
+          title: Center(child: Text('Sell Stock')),
+        ),
+        body: SingleChildScrollView(
+          child: Card(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
+              child: FormWidget(),
+            ),
           ),
         ),
       ),

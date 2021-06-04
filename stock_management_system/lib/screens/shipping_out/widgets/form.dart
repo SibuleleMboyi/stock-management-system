@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/helpers/helpers.dart';
 import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
-import 'package:stock_management_system/widgets/widgets.dart';
 
 class FormWidget extends StatefulWidget {
   @override
@@ -14,6 +13,7 @@ class FormWidget extends StatefulWidget {
 class _FormWidgetState extends State<FormWidget> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
   TextEditingController controller = TextEditingController();
+  String errorMessage = '';
 
   @override
   void dispose() {
@@ -37,10 +37,10 @@ class _FormWidgetState extends State<FormWidget> {
             ),
           );
         } else if (state.status == ShippingOutStatus.error) {
-          showDialog(
-            context: context,
-            builder: (context) => ErrorDialog(content: state.failure.message),
-          );
+          errorMessage = state.failure.message;
+        }
+        if (state.status == ShippingOutStatus.initial) {
+          errorMessage = '';
         }
       },
       builder: (context, state) {
@@ -57,7 +57,7 @@ class _FormWidgetState extends State<FormWidget> {
                   TextFormField(
                     decoration: InputDecoration(
                       labelText: 'Product Barcode',
-                      //errorText: '*Required',
+                      errorText: errorMessage,
                     ),
                     controller: controller,
                     onChanged: (value) => context
@@ -94,9 +94,10 @@ class _FormWidgetState extends State<FormWidget> {
               Stack(
                 children: [
                   TextFormField(
+                    enabled: errorMessage.length == 0 ? true : false,
                     decoration: InputDecoration(
                       labelText: 'Quantity',
-                      //errorText: '*Required',
+                      errorText: state.errorMessage2,
                     ),
                     keyboardType: TextInputType.number,
                     inputFormatters: [FilteringTextInputFormatter.digitsOnly],
@@ -118,7 +119,7 @@ class _FormWidgetState extends State<FormWidget> {
                           fontSize: 10.0,
                         ),
                       ),
-                      state.productBarCode != null
+                      ((state.productBarCode != null) && (errorMessage == ''))
                           ? Text(
                               state.product.quantity.toString(),
                               style: TextStyle(
@@ -165,8 +166,11 @@ class _FormWidgetState extends State<FormWidget> {
 
   Future<void> codeScanner(BuildContext context) async {
     String code = await ScannerHelper.barcodeScanner(context: context);
-    context.read<ShippingOutCubit>().productBarcodeChanged(code);
-    controller.text = code;
+    if (code != '-1') {
+      context.read<ShippingOutCubit>().productBarcodeChanged(code);
+
+      controller.text = code;
+    }
   }
 
   void _submitForm(BuildContext context, bool isSubmitting) {

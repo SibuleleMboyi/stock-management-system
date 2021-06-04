@@ -7,7 +7,7 @@ import 'package:stock_management_system/screens/nav/enums/enums.dart';
 import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
-import 'package:stock_management_system/screens/transaction/cubit/transaction_cubit.dart';
+import 'package:stock_management_system/screens/transactions/cubit/transactions_cubit.dart';
 
 class TabNavigator extends StatelessWidget {
   static const String tabNavigatorRoot = '/';
@@ -74,10 +74,10 @@ class TabNavigator extends StatelessWidget {
 
       case BottomNavItem.transactions:
         return BlocProvider(
-          create: (context) => TransactionCubit(
+          create: (context) => TransactionsCubit(
             productRepository: context.read<ProductRepository>(),
           ),
-          child: TransactionScreen(),
+          child: TransactionsScreen(),
         );
 
       default:

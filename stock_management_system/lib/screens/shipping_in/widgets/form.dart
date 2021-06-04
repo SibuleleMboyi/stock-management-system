@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/helpers/helpers.dart';
+import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
-import 'package:stock_management_system/widgets/widgets.dart';
 
 class FormWidget extends StatefulWidget {
   @override
@@ -12,6 +12,7 @@ class FormWidget extends StatefulWidget {
 
 class _FormWidgetState extends State<FormWidget> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+  String errorMessage = '';
 
   TextEditingController controller = TextEditingController();
 
@@ -37,10 +38,10 @@ class _FormWidgetState extends State<FormWidget> {
             ),
           );
         } else if (state.status == ShippingInStatus.error) {
-          showDialog(
-            context: context,
-            builder: (context) => ErrorDialog(content: state.failure.message),
-          );
+          errorMessage = '*' + state.failure.message;
+        }
+        if (state.status == ShippingInStatus.initial) {
+          errorMessage = '';
         }
       },
       builder: (context, state) {
@@ -56,7 +57,7 @@ class _FormWidgetState extends State<FormWidget> {
                   TextFormField(
                     decoration: InputDecoration(
                       labelText: 'Product Barcode',
-                      //errorText: '*Required',
+                      errorText: errorMessage,
                     ),
                     controller: controller,
                     onChanged: (value) => context
@@ -104,7 +105,6 @@ class _FormWidgetState extends State<FormWidget> {
               TextFormField(
                 decoration: InputDecoration(
                   labelText: 'Product Brand',
-                  //errorText: '*Required',
                 ),
                 onChanged: (value) =>
                     context.read<ShippingInCubit>().productBrandChanged(value),
@@ -149,6 +149,17 @@ class _FormWidgetState extends State<FormWidget> {
                     context, state.status == ShippingInStatus.submitting),
                 child: Text('add'),
               ),
+              const SizedBox(height: 12.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                  onPrimary: Colors.white,
+                  shadowColor: Colors.grey,
+                ),
+                onPressed: () => Navigator.of(context)
+                    .pushNamed(EditProductScreen.routeName),
+                child: Text('edit product'),
+              ),
             ],
           ),
         );
@@ -158,8 +169,11 @@ class _FormWidgetState extends State<FormWidget> {
 
   Future<void> codeScanner(BuildContext context) async {
     String code = await ScannerHelper.barcodeScanner(context: context);
-    context.read<ShippingInCubit>().productBarcodeChanged(code);
-    controller.text = code;
+    if (code != '-1') {
+      context.read<ShippingInCubit>().productBarcodeChanged(code);
+
+      controller.text = code;
+    }
   }
 
   void _submitForm(BuildContext context, bool isSubmitting) {

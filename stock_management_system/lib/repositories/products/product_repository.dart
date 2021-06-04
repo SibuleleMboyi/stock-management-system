@@ -66,7 +66,7 @@ class ProductRepository extends BaseProductRepository {
         .doc(product.productBarCode)
         .set({
       'quantity': doc['quantity'] + product.quantity,
-      'price': doc['price'] + product.price,
+      'price': product.price,
     });
   }
 

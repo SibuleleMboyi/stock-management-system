@@ -18,6 +18,13 @@ class ShippingInCubit extends Cubit<ShippingInState> {
   /// If the product is found,this function emits an error status.
   /// Otherwise it emits this product barcode.
   Future<void> searchProduct(String productBarCode) async {
+    emit(
+      state.copyWith(
+        status: ShippingInStatus.initial,
+      ),
+    );
+
+    print(productBarCode);
     final isProductAvailable = await _productRepository.isProductAvailable(
       productBarCode: productBarCode,
     );
@@ -32,9 +39,9 @@ class ShippingInCubit extends Cubit<ShippingInState> {
     } else {
       emit(
         state.copyWith(
+          productBarCode: productBarCode,
           failure: Failure(
-            message:
-                "product barcode *$productBarCode* is already in stock, update product ?",
+            message: "product barcode '$productBarCode' is already in stock.",
           ),
           status: ShippingInStatus.error,
         ),
@@ -51,7 +58,7 @@ class ShippingInCubit extends Cubit<ShippingInState> {
   /// when submitting the form.
 
   void productBarcodeChanged(String productBarCode) async {
-    if (productBarCode.length <= 1 || productBarCode == '-1') {
+    if (productBarCode.length < 1) {
       return;
     } else {
       await searchProduct(productBarCode);

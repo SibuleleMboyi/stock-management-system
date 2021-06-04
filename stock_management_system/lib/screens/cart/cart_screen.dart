@@ -50,64 +50,67 @@ class CartScreen extends StatelessWidget {
           onRefresh: () async {
             context.read<CartCubit>().products();
           },
-          child: Scaffold(
-            appBar: AppBar(
-              title: Center(
-                child: Text('Cart'),
+          child: GestureDetector(
+            onTap: () => FocusScope.of(context).unfocus(),
+            child: Scaffold(
+              appBar: AppBar(
+                title: Center(
+                  child: Text('Cart'),
+                ),
+                leading: BackButton(
+                  onPressed: () => Navigator.pop(context),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => context.read<CartCubit>().submitOrder(),
+                    child: Text('buy'),
+                  )
+                ],
               ),
-              leading: BackButton(
-                onPressed: () => Navigator.pop(context),
+              body: ListView.builder(
+                itemCount: state.productsList.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final product = state.productsList[index];
+                  final quantity = product.quantity;
+                  final price = product.price;
+                  return ListTile(
+                    leading: Text(index.toString() + ". "),
+                    title: Row(
+                      children: [
+                        Text(
+                          product.productName + '(' + quantity.toString() + ')',
+                        ),
+                        SizedBox(width: 40.0),
+                      ],
+                    ),
+                    subtitle: Column(
+                      children: [
+                        if (state.status == CartStatus.submitting)
+                          const LinearProgressIndicator(),
+                        Row(children: [
+                          Text('each item :'),
+                          SizedBox(width: 20),
+                          Text('R' + price.toString()),
+                        ]),
+                        Row(children: [
+                          Text('total price :'),
+                          SizedBox(width: 20),
+                          Text('R' + (quantity * price).toString()),
+                        ]),
+                      ],
+                    ),
+                    contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                    trailing: TextButton(
+                      onPressed: () {
+                        context
+                            .read<CartCubit>()
+                            .removeItem(productBarCode: product.productBarCode);
+                      },
+                      child: Text('remove'),
+                    ),
+                  );
+                },
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => context.read<CartCubit>().submitOrder(),
-                  child: Text('buy'),
-                )
-              ],
-            ),
-            body: ListView.builder(
-              itemCount: state.productsList.length,
-              itemBuilder: (BuildContext context, int index) {
-                final product = state.productsList[index];
-                final quantity = product.quantity;
-                final price = product.price;
-                return ListTile(
-                  leading: Text(index.toString() + ". "),
-                  title: Row(
-                    children: [
-                      Text(
-                        product.productName + '(' + quantity.toString() + ')',
-                      ),
-                      SizedBox(width: 40.0),
-                    ],
-                  ),
-                  subtitle: Column(
-                    children: [
-                      if (state.status == CartStatus.submitting)
-                        const LinearProgressIndicator(),
-                      Row(children: [
-                        Text('each item :'),
-                        SizedBox(width: 20),
-                        Text('R' + price.toString()),
-                      ]),
-                      Row(children: [
-                        Text('total price :'),
-                        SizedBox(width: 20),
-                        Text('R' + (quantity * price).toString()),
-                      ]),
-                    ],
-                  ),
-                  contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  trailing: TextButton(
-                    onPressed: () {
-                      context
-                          .read<CartCubit>()
-                          .removeItem(productBarCode: product.productBarCode);
-                    },
-                    child: Text('remove'),
-                  ),
-                );
-              },
             ),
           ),
         );

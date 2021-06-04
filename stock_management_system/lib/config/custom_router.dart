@@ -39,6 +39,11 @@ class CustomRouter {
       case CartScreen.routeName:
         return CartScreen.route();
 
+      case ShippingInScreen.routeName:
+        return ShippingOutScreen.route();
+      case EditProductScreen.routeName:
+        return EditProductScreen.route();
+
       default:
         return _errorRoute();
     }

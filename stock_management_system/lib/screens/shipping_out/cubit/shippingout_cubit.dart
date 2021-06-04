@@ -34,9 +34,9 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
     } else {
       emit(
         state.copyWith(
+          product: isProductAvailable,
           failure: Failure(
-            message:
-                "product barcode *$productBarCode* is not available in the stock.",
+            message: 'Product is not in stock',
           ),
           status: ShippingOutStatus.error,
         ),
@@ -45,11 +45,23 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
   }
 
   void productBarcodeChanged(String productBarCode) async {
-    if (productBarCode.length <= 1 || productBarCode == '-1') {
-      return;
+    print(productBarCode);
+    if (productBarCode.length < 1) {
+      emit(state.copyWith(
+        productBarCode: '',
+        status: ShippingOutStatus.error,
+      ));
     } else {
       await searchProduct(productBarCode);
     }
+  }
+
+  void updateProductPrice(int value) {
+    emit(state.copyWith(price: value, status: ShippingOutStatus.initial));
+  }
+
+  void updateProductQuantity(int value) {
+    emit(state.copyWith(quantity: value, status: ShippingOutStatus.initial));
   }
 
   void quantityChanged(int value) {
@@ -58,7 +70,7 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
     } else {
       emit(
         state.copyWith(
-          failure: Failure(message: 'Quantity exceeded the stock'),
+          errorMessage2: 'Quantity exceeded the stock',
           status: ShippingOutStatus.error,
         ),
       );
@@ -78,7 +90,9 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
   }
 
   void addToCart() async {
-    if (!state.isFormValid || state.status == ShippingOutStatus.submitting) {
+    if (!state.isFormValid ||
+        state.status == ShippingOutStatus.submitting ||
+        state.status == ShippingOutStatus.error) {
       return;
     }
 
@@ -102,6 +116,10 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
           status: ShippingOutStatus.error,
           failure: Failure(message: err.message)));
     }
+  }
+
+  void editProduct() async {
+    await _productRepository.updateStockProduct(product: state.product);
   }
 
   void reset() {

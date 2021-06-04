@@ -5,5 +5,6 @@ export 'shipping_in/shipping_in_screen.dart';
 export 'shipping_out/shipping_out_screen.dart';
 export 'cart/cart_screen.dart';
 export 'brands/brands_screen.dart';
-export 'transaction/transaction_screen.dart';
+export 'transactions/transactions_screen.dart';
+export 'edit_product/edit_product_screen.dart';
 export 'nav/nav_screen.dart';

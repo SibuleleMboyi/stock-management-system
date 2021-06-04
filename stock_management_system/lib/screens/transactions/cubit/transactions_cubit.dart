@@ -6,19 +6,19 @@ import 'package:meta/meta.dart';
 import 'package:stock_management_system/models/models.dart';
 import 'package:stock_management_system/repositories/repositories.dart';
 
-part 'transaction_state.dart';
+part 'transactions_state.dart';
 
-class TransactionCubit extends Cubit<TransactionState> {
+class TransactionsCubit extends Cubit<TransactionsState> {
   final ProductRepository _productRepository;
 
-  TransactionCubit({
+  TransactionsCubit({
     @required ProductRepository productRepository,
   })  : _productRepository = productRepository,
-        super(TransactionState.initial());
+        super(TransactionsState.initial());
 
   void transactionsList() async {
-    if (state.status == TransactionStatus.success) return;
-    emit(state.copyWith(status: TransactionStatus.loading));
+    if (state.status == TransactionsStatus.success) return;
+    emit(state.copyWith(status: TransactionsStatus.loading));
 
     try {
       final transactions = await _productRepository.fetchTransactions();
@@ -26,14 +26,14 @@ class TransactionCubit extends Cubit<TransactionState> {
           transactions.map((transaction) => transaction.date).toSet().toList();
       //productsSubList(transactions: transactions);
       emit(state.copyWith(
-        status: TransactionStatus.success,
+        status: TransactionsStatus.success,
         transactionsList: transactions,
         uniqueDates: dates,
       ));
       print(dates);
     } catch (err) {
       state.copyWith(
-          status: TransactionStatus.error,
+          status: TransactionsStatus.error,
           failure: const Failure(message: 'We are unable to load your feed.'));
     }
 
@@ -48,5 +48,5 @@ class TransactionCubit extends Cubit<TransactionState> {
     return list;
   }
 
-  void reset() => emit(TransactionState.initial());
+  void reset() => emit(TransactionsState.initial());
 }

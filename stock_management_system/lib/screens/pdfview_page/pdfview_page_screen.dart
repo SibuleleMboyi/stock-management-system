@@ -11,8 +11,6 @@ class PdfViewPageScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Transaction'),
-
-        //leading: IconButton(color: Colors.black, icon: Icon(Icons.arrow_back), onPressed: , ),
       ),
       body: PDF().fromUrl(
         transactionPdfUrl,

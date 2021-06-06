@@ -8,3 +8,4 @@ export 'brands/brands_screen.dart';
 export 'transactions/transactions_screen.dart';
 export 'edit_product/edit_product_screen.dart';
 export 'nav/nav_screen.dart';
+export 'pdfview_page/pdfview_page_screen.dart';

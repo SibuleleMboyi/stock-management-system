@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 import 'package:sticky_headers/sticky_headers/widget.dart';
-import 'package:stock_management_system/widgets/pdfview_page_screen.dart';
+import 'package:stock_management_system/screens/screens.dart';
 
 class StickyHearderGridView extends StatelessWidget {
   final List<String> uniqueDates;
@@ -24,7 +24,6 @@ class StickyHearderGridView extends StatelessWidget {
               return StickyHeader(
                 header: Container(
                   height: 50.0,
-                  //color: Colors.white,
                   color: Colors.black12,
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.fromLTRB(10, 20, 0, 10),
@@ -34,6 +33,7 @@ class StickyHearderGridView extends StatelessWidget {
                   ),
                 ),
                 content: Container(
+                  color: Colors.black12,
                   child: GridView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -46,10 +46,10 @@ class StickyHearderGridView extends StatelessWidget {
                       crossAxisCount: 2,
                     ),
                     itemBuilder: (context, index) {
-                      //TODO: make this gesture detector work
                       return GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
+                        onDoubleTap: () {
+                          Navigator.push(
+                            context,
                             MaterialPageRoute(
                               builder: (context) => PdfViewPageScreen(
                                 transactionPdfUrl: transactionsSubListFunc(
@@ -59,12 +59,14 @@ class StickyHearderGridView extends StatelessWidget {
                             ),
                           );
                         },
-                        child: PDF().fromUrl(
-                          transactionsSubListFunc(
-                                  uniqueDate: uniqueDates[index1])[index]
-                              .transactionPdfUrl,
-                          placeholder: (double progress) =>
-                              const LinearProgressIndicator(),
+                        child: Container(
+                          child: PDF().fromUrl(
+                            transactionsSubListFunc(
+                                    uniqueDate: uniqueDates[index1])[index]
+                                .transactionPdfUrl,
+                            placeholder: (double progress) =>
+                                const LinearProgressIndicator(),
+                          ),
                         ),
                       );
                     },

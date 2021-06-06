@@ -96,7 +96,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                   onPressed: () => codeScanner(context),
                                   child: Column(children: [
                                     Icon(
-                                      Icons.home,
+                                      Icons.camera_alt_outlined,
                                       color: Colors.black,
                                     ),
                                     Text(

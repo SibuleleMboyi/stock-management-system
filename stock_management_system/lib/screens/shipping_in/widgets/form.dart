@@ -74,7 +74,7 @@ class _FormWidgetState extends State<FormWidget> {
                       onPressed: () => codeScanner(context),
                       child: Column(children: [
                         Icon(
-                          Icons.home,
+                          Icons.camera_alt_outlined,
                           color: Colors.black,
                         ),
                         Text(

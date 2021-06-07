@@ -38,69 +38,80 @@ class LoginScreen extends StatelessWidget {
           return Scaffold(
             resizeToAvoidBottomInset: false,
             body: Center(
-              child: Card(
-                color: Colors.white,
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Sign In',
-                          style: TextStyle(
-                            fontSize: 28.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          textAlign: TextAlign.center,
+              child: Column(
+                children: [
+                  (state.status == LoginStatus.submitting)
+                      ? const LinearProgressIndicator()
+                      : SizedBox.shrink(),
+                  Card(
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text(
+                              'Sign In',
+                              style: TextStyle(
+                                fontSize: 28.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 12.0),
+                            TextFormField(
+                              decoration: InputDecoration(hintText: 'Email'),
+                              onChanged: (value) => context
+                                  .read<LoginCubit>()
+                                  .emailChanged(value),
+                              validator: (value) => !value.contains('@')
+                                  ? 'Please enter valid email '
+                                  : null,
+                            ),
+                            const SizedBox(height: 16.0),
+                            TextFormField(
+                              obscureText: true,
+                              decoration:
+                                  InputDecoration(hintText: 'Passoword'),
+                              onChanged: (value) => context
+                                  .read<LoginCubit>()
+                                  .passwordChanged(value),
+                              validator: (value) => value.length == 0
+                                  ? 'Must be at least 6 characters'
+                                  : null,
+                            ),
+                            const SizedBox(height: 28.0),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Theme.of(context).primaryColor,
+                                onPrimary: Colors.white,
+                                shadowColor: Colors.grey,
+                              ),
+                              onPressed: () => _submitForm(context,
+                                  state.status == LoginStatus.submitting),
+                              child: Text('Login'),
+                            ),
+                            const SizedBox(height: 12.0),
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                primary: Colors.grey[200],
+                                onPrimary: Colors.black,
+                                shadowColor: Colors.grey,
+                              ),
+                              onPressed: () => Navigator.of(context)
+                                  .pushNamed(SignupScreen.routeName),
+                              child: Text('Register'),
+                            )
+                          ],
                         ),
-                        const SizedBox(height: 12.0),
-                        TextFormField(
-                          decoration: InputDecoration(hintText: 'Email'),
-                          onChanged: (value) =>
-                              context.read<LoginCubit>().emailChanged(value),
-                          validator: (value) => !value.contains('@')
-                              ? 'Please enter valid email '
-                              : null,
-                        ),
-                        const SizedBox(height: 16.0),
-                        TextFormField(
-                          decoration: InputDecoration(hintText: 'Passoword'),
-                          onChanged: (value) =>
-                              context.read<LoginCubit>().passwordChanged(value),
-                          validator: (value) => value.length == 0
-                              ? 'Must be at least 6 characters'
-                              : null,
-                        ),
-                        const SizedBox(height: 28.0),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: Theme.of(context).primaryColor,
-                            onPrimary: Colors.white,
-                            shadowColor: Colors.grey,
-                          ),
-                          onPressed: () => _submitForm(
-                              context, state.status == LoginStatus.submitting),
-                          child: Text('Login'),
-                        ),
-                        const SizedBox(height: 12.0),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.grey[200],
-                            onPrimary: Colors.black,
-                            shadowColor: Colors.grey,
-                          ),
-                          onPressed: () => Navigator.of(context)
-                              .pushNamed(SignupScreen.routeName),
-                          child: Text('Register'),
-                        )
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           );

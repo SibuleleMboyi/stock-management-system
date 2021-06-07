@@ -11,8 +11,7 @@ class ProfileCubit extends Cubit<ProfileState> {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
   final AuthBloc _authBloc;
-  List<String> _adminCredentials;
-  String _managerEmail;
+
   ProfileCubit({
     @required AuthRepository authRepository,
     @required UserRepository userRepository,
@@ -25,21 +24,12 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   void loadExtraData() async {
-    final list = await _userRepository.getBuiltInAdminEmailAccount();
-    final String managerEmail =
-        await _userRepository.getBuiltInManagerUserEmail();
     final currentUserId = _authBloc.state.user.uid;
     final user = await _userRepository.getUserWithId(userId: currentUserId);
-
-    _adminCredentials = list;
-    _managerEmail = managerEmail;
 
     emit(
       state.copyWith(
         user: user,
-        adminEmail: list[0],
-        adminPassword: list[1],
-        managerEmail: managerEmail,
         status: ProfileStatus.initial,
       ),
     );
@@ -73,46 +63,70 @@ class ProfileCubit extends Cubit<ProfileState> {
     // print(state.user.username);
     if (state.status == ProfileStatus.submitting) return;
 
-    if (_managerEmail == null || _adminCredentials.isEmpty) {
+    final list = await _userRepository.getBuiltInAdminEmailAccount();
+    final String managerEmail =
+        await _userRepository.getBuiltInManagerUserEmail();
+
+    if ((managerEmail == '' && state.managerEmail == '') ||
+        (list.length == 0 &&
+            (state.adminEmail == '' || state.adminPassword == ''))) {
+      print(managerEmail);
+      print(list);
       emit(
         state.copyWith(
           status: ProfileStatus.error,
           failure: Failure(
             message:
-                'Please register Manager Email, Admin Email and Admin Password and  \n Enable less secure apps to access Gmail.',
+                'Please register Manager Email, Admin Email and Admin Email Password.\nEnable less secure apps to access Gmail.',
           ),
         ),
       );
-    }
+      return;
+    } else if (state.username == '' &&
+        state.adminPassword == '' &&
+        state.adminEmail == '' &&
+        state.managerEmail == '') {
+      emit(
+        state.copyWith(
+          status: ProfileStatus.error,
+          failure: Failure(
+            message: 'Nothing to update.',
+          ),
+        ),
+      );
 
-    emit(state.copyWith(status: ProfileStatus.submitting));
-    try {
-      /* if (state.password != '') {
+      return;
+    } else {
+      emit(state.copyWith(status: ProfileStatus.submitting));
+      try {
+        /* if (state.password != '') {
         await _authRepository.updatePassword(password: state.password);
       } */
 
-      print('Admin Email: ' + state.adminEmail);
-      print('Admin Password: ' + state.adminPassword);
-      final updatedUser = state.user.copyWith(
-        username: state.username,
-      );
+        print('Admin Email: ' + state.adminEmail);
+        print('Admin Password: ' + state.adminPassword);
+        final updatedUser = state.user.copyWith(
+          username: state?.username,
+        );
 
-      await _userRepository.updateUser(user: updatedUser);
+        await _userRepository.updateUser(user: updatedUser);
 
-      await _userRepository.builtInManagerUserEmail(email: state.managerEmail);
-      await _userRepository.builtInAdminEmailAccount(
-        email: state.adminEmail,
-        password: state.adminPassword,
-      );
+        await _userRepository.builtInManagerUserEmail(
+            email: state.managerEmail);
+        await _userRepository.builtInAdminEmailAccount(
+          email: state.adminEmail,
+          password: state.adminPassword,
+        );
 
-      emit(state.copyWith(status: ProfileStatus.success));
-    } on Failure catch (err) {
-      emit(
-        state.copyWith(
-          failure: Failure(code: err.code, message: err.message),
-          status: ProfileStatus.error,
-        ),
-      );
+        emit(state.copyWith(status: ProfileStatus.success));
+      } on Failure catch (err) {
+        emit(
+          state.copyWith(
+            failure: Failure(code: err.code, message: err.message),
+            status: ProfileStatus.error,
+          ),
+        );
+      }
     }
   }
 

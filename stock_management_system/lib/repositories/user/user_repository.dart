@@ -50,8 +50,10 @@ class UserRepository extends BaseUserRepository {
         .collection(Paths.builtInCredentials)
         .doc(Paths.admin)
         .get();
-    if (doc.exists) return [doc['email'], doc['password']];
-    return ['', ''];
+    if (doc.exists) {
+      return [doc['email'], doc['password']];
+    }
+    return [];
   }
 
   @override
@@ -61,6 +63,6 @@ class UserRepository extends BaseUserRepository {
         .doc(Paths.manager)
         .get();
     if (doc.exists) return doc['email'];
-    return null;
+    return '';
   }
 }

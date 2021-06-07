@@ -31,7 +31,7 @@ class ShippingOutScreen extends StatelessWidget {
           child: Card(
             color: Colors.white,
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
+              padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 12.0),
               child: FormWidget(),
             ),
           ),

@@ -49,7 +49,7 @@ class ShippingInState extends Equatable {
         quantity,
         price,
         status,
-        failure
+        failure,
       ];
 
   ShippingInState copyWith({

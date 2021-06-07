@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:flutter/material.dart';
 
-abstract class BaseAuthRepository{
-
+abstract class BaseAuthRepository {
   // continously gets the state of the current user i.e If the user is loggedIn or loggedOut
   Stream<auth.User> get user;
 
@@ -17,6 +17,7 @@ abstract class BaseAuthRepository{
     String password,
   });
 
-  Future<void> logOut();
+  Future<void> updatePassword({@required String password});
 
+  Future<void> logOut();
 }

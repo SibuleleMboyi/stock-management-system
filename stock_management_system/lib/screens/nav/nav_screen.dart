@@ -24,16 +24,16 @@ class NavigatorScreen extends StatelessWidget {
     BottomNavItem.shippingIn: GlobalKey<NavigatorState>(),
     BottomNavItem.shippingOut: GlobalKey<NavigatorState>(),
     BottomNavItem.brands: GlobalKey<NavigatorState>(),
-    BottomNavItem.productsCategories: GlobalKey<NavigatorState>(),
     BottomNavItem.transactions: GlobalKey<NavigatorState>(),
+    BottomNavItem.profile: GlobalKey<NavigatorState>(),
   };
 
   final Map<BottomNavItem, List> items = const {
     BottomNavItem.shippingIn: [Icons.home, 'Stock In'],
     BottomNavItem.shippingOut: [Icons.add, 'Stock Out'],
     BottomNavItem.brands: [Icons.food_bank, 'Brands'],
-    BottomNavItem.productsCategories: [Icons.home, 'Products'],
     BottomNavItem.transactions: [Icons.home, 'Transactions'],
+    BottomNavItem.profile: [Icons.home, 'profile'],
   };
 
   @override

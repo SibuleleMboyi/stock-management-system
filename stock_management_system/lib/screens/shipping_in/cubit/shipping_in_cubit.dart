@@ -1,16 +1,19 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+
 import 'package:stock_management_system/models/models.dart';
 import 'package:stock_management_system/repositories/products/product_repository.dart';
+import 'package:stock_management_system/repositories/repositories.dart';
 
 part 'shipping_in_state.dart';
 
 class ShippingInCubit extends Cubit<ShippingInState> {
   final ProductRepository _productRepository;
 
-  ShippingInCubit({@required ProductRepository productRepository})
-      : _productRepository = productRepository,
+  ShippingInCubit({
+    @required ProductRepository productRepository,
+  })  : _productRepository = productRepository,
         super(ShippingInState.initial());
 
   /// This function receives a product barcode and

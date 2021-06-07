@@ -62,6 +62,21 @@ class AuthRepository extends BaseAuthRepository {
   }
 
   @override
+  Future<void> updatePassword({@required String password}) async {
+    // TODO: For satefy, allow updating password via user email
+
+    if (password != null) {
+      try {
+        await _firebaseAuth.currentUser.updatePassword(password);
+      } on auth.FirebaseAuthException catch (err) {
+        throw Failure(code: err.code, message: err.message);
+      } on PlatformException catch (err) {
+        throw Failure(code: err.code, message: err.message);
+      }
+    }
+  }
+
+  @override
   Future<void> logOut() async {
     await _firebaseAuth.signOut();
   }

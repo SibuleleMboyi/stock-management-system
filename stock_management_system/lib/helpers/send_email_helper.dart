@@ -4,19 +4,24 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
 class EmailSender {
-  // TODO: create email for this project
+  static String adminEmail;
+  static String adminPassword;
+  static String managerEmail;
   static String senderName = 'Admin-Account';
+
+  // TODO: create email for this project
+/*   static String senderName = 'Admin-Account';
   static String senderUsername = 'luckysimcard2021@gmail.com';
   static String senderPassword = '1521128sibuleleh';
-  static String receiverUsername = 'smboyi2016@gmail.com';
+  static String receiverUsername = 'smboyi2016@gmail.com'; */
 
   static Future<void> sendEmail({@required String pdfFilePath}) async {
-    final smtpServer = gmail(senderUsername, senderPassword);
+    final smtpServer = gmail(adminEmail, adminPassword);
 
     final message = Message()
       ..toString()
-      ..from = Address(senderUsername, senderName)
-      ..recipients.add(receiverUsername)
+      ..from = Address(adminEmail, senderName)
+      ..recipients.add(managerEmail)
       ..subject = 'TRANSACTION'
       ..text = '- New Transaction.'
       ..html = '<p>Please find the attachment of the new transaction</p>'

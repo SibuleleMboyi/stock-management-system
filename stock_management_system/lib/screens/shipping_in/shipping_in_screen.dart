@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:stock_management_system/repositories/repositories.dart';
 import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
 import 'package:stock_management_system/screens/shipping_in/widgets/form.dart';
@@ -13,7 +14,8 @@ class ShippingInScreen extends StatelessWidget {
       settings: const RouteSettings(name: routeName),
       builder: (context) => BlocProvider<ShippingInCubit>(
         create: (_) => ShippingInCubit(
-            productRepository: context.read<ProductRepository>()),
+          productRepository: context.read<ProductRepository>(),
+        ),
         child: ShippingInScreen(),
       ),
     );

@@ -18,4 +18,49 @@ class UserRepository extends BaseUserRepository {
     /// we convert the 'doc'(document) that we get from Firestore to our user model.
     return doc.exists ? User.fromDocument(doc) : User.empty;
   }
+
+  @override
+  Future<void> updateUser({User user}) async {
+    await _firebaseFirestore
+        .collection(Paths.users)
+        .doc(user.id)
+        .update(user.toDocument());
+  }
+
+  @override
+  Future<void> builtInManagerUserEmail({String email}) async {
+    await _firebaseFirestore
+        .collection(Paths.builtInCredentials)
+        .doc(Paths.manager)
+        .set({'email': email});
+  }
+
+  @override
+  Future<void> builtInAdminEmailAccount(
+      {@required String email, @required String password}) async {
+    await _firebaseFirestore
+        .collection(Paths.builtInCredentials)
+        .doc(Paths.admin)
+        .set({'email': email, 'password': password});
+  }
+
+  @override
+  Future<List<String>> getBuiltInAdminEmailAccount() async {
+    final doc = await _firebaseFirestore
+        .collection(Paths.builtInCredentials)
+        .doc(Paths.admin)
+        .get();
+    if (doc.exists) return [doc['email'], doc['password']];
+    return ['', ''];
+  }
+
+  @override
+  Future<String> getBuiltInManagerUserEmail() async {
+    final doc = await _firebaseFirestore
+        .collection(Paths.builtInCredentials)
+        .doc(Paths.manager)
+        .get();
+    if (doc.exists) return doc['email'];
+    return null;
+  }
 }

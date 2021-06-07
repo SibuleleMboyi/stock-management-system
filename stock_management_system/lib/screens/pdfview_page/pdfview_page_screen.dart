@@ -10,11 +10,13 @@ class PdfViewPageScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Transaction'),
+        title: Center(child: Text('Transaction')),
       ),
       body: PDF().fromUrl(
         transactionPdfUrl,
-        placeholder: (double progress) => const LinearProgressIndicator(),
+        placeholder: (double progress) => const LinearProgressIndicator(
+          minHeight: 2.0,
+        ),
       ),
     );
   }

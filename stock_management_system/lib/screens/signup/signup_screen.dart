@@ -43,7 +43,7 @@ class SignupScreen extends StatelessWidget {
               return Scaffold(
                   resizeToAvoidBottomInset: false,
                   body: Center(
-                    child: Column(
+                    child: Stack(
                       children: [
                         (state.status == SignupStatus.submitting)
                             ? const LinearProgressIndicator()

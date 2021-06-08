@@ -38,6 +38,7 @@ class SignupCubit extends Cubit<SignupState> {
     if (!state.isFormValid || state.status == SignupStatus.submitting) {
       return;
     }
+    emit(state.copyWith(status: SignupStatus.submitting));
     try {
       await _authRepository.signUpWithEmailAndPassword(
         username: state.username,
@@ -45,6 +46,8 @@ class SignupCubit extends Cubit<SignupState> {
         password: state.password,
         userType: state.userType,
       );
+
+      emit(state.copyWith(status: SignupStatus.success));
     } on Failure catch (err) {
       emit(state.copyWith(failure: err, status: SignupStatus.error));
     }

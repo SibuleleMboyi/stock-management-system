@@ -38,7 +38,7 @@ class LoginScreen extends StatelessWidget {
           return Scaffold(
             resizeToAvoidBottomInset: false,
             body: Center(
-              child: Column(
+              child: Stack(
                 children: [
                   (state.status == LoginStatus.submitting)
                       ? const LinearProgressIndicator()

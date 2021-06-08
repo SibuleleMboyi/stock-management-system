@@ -190,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const SizedBox(height: 40.0),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Text('My sDetails'),
+                            child: Text('My Details'),
                           ),
                           Container(
                             decoration: BoxDecoration(

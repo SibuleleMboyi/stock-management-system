@@ -33,7 +33,7 @@ class EmailSender {
     } on MailerException catch (error) {
       throw Failure(
         message:
-            'Incorrect Admin Email or Password.\nGo to Edit Profile and update your email credentials.',
+            'Incorrect Admin Email or Password.\nGo to Edit Profile and update Admin email credentials.',
       );
       /* for (var p in error.problems) {
         print('Problem: ${p.code}: ${p.msg}');

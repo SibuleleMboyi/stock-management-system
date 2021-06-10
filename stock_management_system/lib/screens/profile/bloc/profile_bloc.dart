@@ -14,6 +14,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   final AuthRepository _authRepository;
   final UserRepository _userRepository;
   final AuthBloc _authBloc;
+  List adminCredentials;
+  String managerEmail;
+  User user;
 
   ProfileBloc({
     @required AuthRepository authRepository,
@@ -56,12 +59,11 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       String initManagerEmail = '';
       String initUsername = '';
       final currentUserId = _authBloc.state.user.uid;
-      final user = await _userRepository.getUserWithId(userId: currentUserId);
+      user = await _userRepository.getUserWithId(userId: currentUserId);
 
       final adminCredentials =
           await _userRepository.getBuiltInAdminEmailAccount();
-      final String managerEmail =
-          await _userRepository.getBuiltInManagerUserEmail();
+      final managerEmail = await _userRepository.getBuiltInManagerUserEmail();
 
       if (adminCredentials.isNotEmpty && managerEmail != '') {
         initAdminEmail = adminCredentials[0];
@@ -109,12 +111,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
 
   Stream<ProfileState> _mapSubmitChanges(SubmitChanges event) async* {
     if (state.status == ProfileStatus.submitting) return;
-
     final adminCredentials =
         await _userRepository.getBuiltInAdminEmailAccount();
-    final String managerEmail =
-        await _userRepository.getBuiltInManagerUserEmail();
-
+    final managerEmail = await _userRepository.getBuiltInManagerUserEmail();
     ////////////////////////////////////////////////////////////////////
     // Error Handling                                                 //
     ////////////////////////////////////////////////////////////////////
@@ -129,7 +128,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         ),
       );
     } else if (adminCredentials.length != 0 &&
-        (state.username == state.user.username &&
+        (state.username == user.username &&
             state.adminEmail == adminCredentials[0] &&
             state.adminPassword == adminCredentials[1] &&
             state.managerEmail == managerEmail)) {
@@ -152,20 +151,16 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         print('Admin Email: ' + state.adminEmail);
         print('Admin Password: ' + state.adminPassword);
         final updatedUser = state.user.copyWith(
-          username: state.username != '' ? state.username : state.user.username,
+          username: state.username ?? user.username,
         );
 
         await _userRepository.updateUser(user: updatedUser);
 
         await _userRepository.builtInManagerUserEmail(
-            email:
-                state.managerEmail != '' ? state.managerEmail : managerEmail);
+            email: state.managerEmail ?? managerEmail);
         await _userRepository.builtInAdminEmailAccount(
-          email:
-              state.adminEmail != '' ? state.adminEmail : adminCredentials[0],
-          password: state.adminPassword != ''
-              ? state.adminPassword
-              : adminCredentials[1],
+          email: state.adminEmail ?? adminCredentials[0],
+          password: state.adminPassword ?? adminCredentials[1],
         );
 
         yield state.copyWith(status: ProfileStatus.success);

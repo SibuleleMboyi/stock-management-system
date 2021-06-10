@@ -63,15 +63,6 @@ class CartCubit extends Cubit<CartState> {
         user: state.user,
       );
 
-      await _productRepository.buyProducts(
-        cashierId: state.user.id,
-      );
-
-      await _storageRepository.uploadPdfToDatabase(
-        pdf: pdfFile,
-        transaction: transaction,
-      );
-
       final list = await _userRepository.getBuiltInAdminEmailAccount();
       final managerEmail = await _userRepository.getBuiltInManagerUserEmail();
 
@@ -79,15 +70,30 @@ class CartCubit extends Cubit<CartState> {
         EmailSender.adminEmail = list[0];
         EmailSender.adminPassword = list[1];
         EmailSender.managerEmail = managerEmail;
-        await EmailSender.sendEmail(pdfFilePath: SavePdf.filePath());
-        emit(state.copyWith(status: CartStatus.success));
+        try {
+          await EmailSender.sendEmail(pdfFilePath: SavePdf.filePath());
+
+          await _productRepository.buyProducts(
+            cashierId: state.user.id,
+          );
+
+          await _storageRepository.uploadPdfToDatabase(
+            pdf: pdfFile,
+            transaction: transaction,
+          );
+          emit(state.copyWith(status: CartStatus.success));
+        } catch (err) {
+          emit(
+            state.copyWith(status: CartStatus.error, failure: err),
+          );
+        }
       } else {
         emit(
           state.copyWith(
             status: CartStatus.error,
             failure: Failure(
                 message:
-                    'Configure Admin and Manager emails on the Profile tab. \n Enable less secure apps to access Gmail.'),
+                    'Configure Admin and Manager emails on the Profile tab.\nEnable less secure apps to access Gmail.'),
           ),
         );
       }

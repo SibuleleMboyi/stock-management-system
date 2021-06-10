@@ -74,16 +74,6 @@ class TabNavigator extends StatelessWidget {
           child: TransactionsScreen(),
         );
 
-/*       case BottomNavItem.profile:
-        return BlocProvider(
-          create: (context) => ProfileCubit(
-            authRepository: context.read<AuthRepository>(),
-            userRepository: context.read<UserRepository>(),
-            authBloc: context.read<AuthBloc>(),
-          ),
-          child: ProfileScreen(),
-        ); */
-
       case BottomNavItem.profile:
         return BlocProvider(
           create: (context) => ProfileBloc(
@@ -91,7 +81,7 @@ class TabNavigator extends StatelessWidget {
             userRepository: context.read<UserRepository>(),
             authBloc: context.read<AuthBloc>(),
           )..add(ProfileLoadInitialInfo()),
-          child: CheckProfileScreen(),
+          child: ProfileScreen(),
         );
 
       default:

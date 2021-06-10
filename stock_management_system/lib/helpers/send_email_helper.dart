@@ -2,18 +2,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:stock_management_system/models/models.dart';
 
 class EmailSender {
   static String adminEmail;
   static String adminPassword;
   static String managerEmail;
   static String senderName = 'Admin-Account';
-
-  // TODO: create email for this project
-/*   static String senderName = 'Admin-Account';
-  static String senderUsername = 'luckysimcard2021@gmail.com';
-  static String senderPassword = '1521128sibuleleh';
-  static String receiverUsername = 'smboyi2016@gmail.com'; */
 
   static Future<void> sendEmail({@required String pdfFilePath}) async {
     final smtpServer = gmail(adminEmail, adminPassword);
@@ -36,10 +31,13 @@ class EmailSender {
 
       print('Email sent : ' + sendReport.toString());
     } on MailerException catch (error) {
-      print('Message not sent.');
-      for (var p in error.problems) {
+      throw Failure(
+        message:
+            'Incorrect Admin Email or Password.\nGo to Edit Profile and update your email credentials.',
+      );
+      /* for (var p in error.problems) {
         print('Problem: ${p.code}: ${p.msg}');
-      }
+      } */
     }
   }
 }

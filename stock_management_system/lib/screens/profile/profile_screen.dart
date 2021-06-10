@@ -3,17 +3,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/screens/profile/bloc/profile_bloc.dart';
 import 'package:stock_management_system/widgets/widgets.dart';
 
-class CheckProfileScreen extends StatefulWidget {
+class ProfileScreen extends StatefulWidget {
   @override
-  _CheckProfileScreenState createState() => _CheckProfileScreenState();
+  _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _CheckProfileScreenState extends State<CheckProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-    bool _showPass1 = false;
-    bool _showPass2 = true;
 
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
@@ -159,20 +157,13 @@ class _CheckProfileScreenState extends State<CheckProfileScreen> {
                                               )
                                             : Icon(Icons.visibility),
                                         onPressed: () {
-                                          //TODO :: Implement Event to make this working
                                           context.read<ProfileBloc>().add(
                                                 ToogleViewPassword(
                                                   isVisible:
                                                       state.isPassVisible,
                                                 ),
                                               );
-                                          print(state.isPassVisible);
-
-                                          /*  setState(
-                                            () {
-                                              _showPass1 = !_showPass1;
-                                            },
-                                          ); */
+                                          //print(state.isPassVisible);
                                         },
                                       ),
                                     ),
@@ -219,7 +210,7 @@ class _CheckProfileScreenState extends State<CheckProfileScreen> {
                                       TextFormField(
                                         readOnly: true,
                                         //initialValue: state.adminPassword,
-                                        obscureText: _showPass2,
+                                        obscureText: false,
                                         decoration: InputDecoration(
                                           hintText: 'Password',
                                           border: InputBorder.none,
@@ -234,20 +225,12 @@ class _CheckProfileScreenState extends State<CheckProfileScreen> {
                                         top: 0.0,
                                         right: 18.0,
                                         child: IconButton(
-                                          icon: _showPass2
-                                              ? Icon(
-                                                  Icons.visibility_off,
-                                                  color: Colors.black45,
-                                                  size: 20.0,
-                                                )
-                                              : Icon(Icons.visibility),
-                                          onPressed: () {
-                                            setState(
-                                              () {
-                                                _showPass2 = !_showPass2;
-                                              },
-                                            );
-                                          },
+                                          icon: Icon(
+                                            Icons.visibility_off,
+                                            color: Colors.black45,
+                                            size: 20.0,
+                                          ),
+                                          onPressed: () => {},
                                         ),
                                       ),
                                     ],

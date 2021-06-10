@@ -64,9 +64,11 @@ class StickyHearderGridView extends StatelessWidget {
                             transactionsSubListFunc(
                                     uniqueDate: uniqueDates[index1])[index]
                                 .transactionPdfUrl,
-                            placeholder: (double progress) =>
-                                const LinearProgressIndicator(
-                              minHeight: 2.0,
+                            placeholder: (double progress) => Align(
+                              alignment: Alignment.center,
+                              child: const LinearProgressIndicator(
+                                minHeight: 2.0,
+                              ),
                             ),
                           ),
                         ),

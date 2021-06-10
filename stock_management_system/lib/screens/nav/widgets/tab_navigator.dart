@@ -5,7 +5,7 @@ import 'package:stock_management_system/config/custom_router.dart';
 import 'package:stock_management_system/repositories/products/product_repository.dart';
 import 'package:stock_management_system/repositories/repositories.dart';
 import 'package:stock_management_system/screens/nav/enums/enums.dart';
-import 'package:stock_management_system/screens/profile/cubit/profile_cubit.dart';
+import 'package:stock_management_system/screens/profile/bloc/profile_bloc.dart';
 import 'package:stock_management_system/screens/screens.dart';
 import 'package:stock_management_system/screens/shipping_in/cubit/shipping_in_cubit.dart';
 import 'package:stock_management_system/screens/shipping_out/cubit/shippingout_cubit.dart';
@@ -74,7 +74,7 @@ class TabNavigator extends StatelessWidget {
           child: TransactionsScreen(),
         );
 
-      case BottomNavItem.profile:
+/*       case BottomNavItem.profile:
         return BlocProvider(
           create: (context) => ProfileCubit(
             authRepository: context.read<AuthRepository>(),
@@ -82,6 +82,16 @@ class TabNavigator extends StatelessWidget {
             authBloc: context.read<AuthBloc>(),
           ),
           child: ProfileScreen(),
+        ); */
+
+      case BottomNavItem.profile:
+        return BlocProvider(
+          create: (context) => ProfileBloc(
+            authRepository: context.read<AuthRepository>(),
+            userRepository: context.read<UserRepository>(),
+            authBloc: context.read<AuthBloc>(),
+          )..add(ProfileLoadInitialInfo()),
+          child: CheckProfileScreen(),
         );
 
       default:

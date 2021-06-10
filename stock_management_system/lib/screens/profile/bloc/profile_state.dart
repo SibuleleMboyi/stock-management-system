@@ -1,4 +1,4 @@
-part of 'profile_cubit.dart';
+part of 'profile_bloc.dart';
 
 enum ProfileStatus { initial, submitting, success, error }
 
@@ -10,6 +10,7 @@ class ProfileState extends Equatable {
   final String managerEmail;
   final String username;
   final String password;
+  final bool isPassVisible;
   final ProfileStatus status;
   final Failure failure;
 
@@ -20,6 +21,7 @@ class ProfileState extends Equatable {
     @required this.managerEmail,
     @required this.username,
     @required this.password,
+    @required this.isPassVisible,
     @required this.status,
     @required this.failure,
   });
@@ -32,6 +34,7 @@ class ProfileState extends Equatable {
         managerEmail,
         username,
         password,
+        isPassVisible,
         status,
         failure,
       ];
@@ -44,6 +47,7 @@ class ProfileState extends Equatable {
       managerEmail: '',
       username: '',
       password: '',
+      isPassVisible: true,
       status: ProfileStatus.initial,
       failure: Failure(),
     );
@@ -56,6 +60,7 @@ class ProfileState extends Equatable {
     String managerEmail,
     String username,
     String password,
+    bool isPassVisible,
     ProfileStatus status,
     Failure failure,
   }) {
@@ -66,6 +71,7 @@ class ProfileState extends Equatable {
       managerEmail: managerEmail ?? this.managerEmail,
       username: username ?? this.username,
       password: password ?? this.password,
+      isPassVisible: isPassVisible ?? this.isPassVisible,
       status: status ?? this.status,
       failure: failure ?? this.failure,
     );

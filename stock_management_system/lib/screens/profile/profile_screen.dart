@@ -1,35 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:stock_management_system/blocs/blocs.dart';
-import 'package:stock_management_system/repositories/repositories.dart';
-import 'package:stock_management_system/screens/profile/preload_data.dart';
-import 'package:stock_management_system/screens/profile/cubit/profile_cubit.dart';
+import 'package:stock_management_system/screens/profile/bloc/profile_bloc.dart';
 import 'package:stock_management_system/widgets/widgets.dart';
 
-/// Contains brands this company is currently ordering from or is in partnership with
-
-class ProfileScreen extends StatefulWidget {
+class CheckProfileScreen extends StatefulWidget {
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  _CheckProfileScreenState createState() => _CheckProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  static String initialAdminEmail = '';
-  static String initialAdminEmailPassword = '';
-  static String initialManagerEmail = '';
-  static String initialUsername = '';
-  bool _showPass1 = true;
-  bool _showPass2 = true;
-
+class _CheckProfileScreenState extends State<CheckProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<ProfileCubit, ProfileState>(
+    final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+    bool _showPass1 = false;
+    bool _showPass2 = true;
+
+    return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
-        if (state.status == ProfileStatus.submitting) {
-          const LinearProgressIndicator();
-        } else if (state.status == ProfileStatus.success) {
-          context.read<ProfileCubit>().reset();
+        if (state.status == ProfileStatus.success) {
+          //context.read<ProfileBloc>().add(Reset());
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               backgroundColor: Colors.green,
@@ -45,33 +34,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       },
       builder: (context, state) {
-        context.read<ProfileCubit>().loadExtraData();
-        loadCheckData(context: context);
-
-        print([
-          state.username,
-          state.managerEmail,
-          state.adminEmail,
-          state.adminPassword
-        ]);
-
-        return (initialAdminEmail == null &&
-                initialAdminEmailPassword == null &&
-                initialManagerEmail == null)
-            ? const LinearProgressIndicator()
-            : Scaffold(
-                appBar: AppBar(
-                  title: Center(child: Text('Edit Profile')),
-                  actions: [
-                    IconButton(
-                        icon: const Icon(Icons.exit_to_app),
-                        onPressed: () {
-                          context.read<ProfileCubit>().logOut();
-                        })
-                  ],
-                ),
-                body: SingleChildScrollView(
-                  child: Padding(
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            appBar: AppBar(
+              title: Center(child: Text('Edit Profile')),
+              actions: [
+                IconButton(
+                    icon: const Icon(Icons.exit_to_app),
+                    onPressed: () {
+                      context.read<ProfileBloc>().add(LogOut());
+                    })
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Stack(
+                children: [
+                  (state.status == ProfileStatus.submitting)
+                      ? const LinearProgressIndicator()
+                      : SizedBox.shrink(),
+                  Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Form(
                       key: _formkey,
@@ -95,14 +77,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextFormField(
-                                    initialValue: initialManagerEmail,
+                                    initialValue: state.managerEmail,
                                     decoration: InputDecoration(
                                       hintText: 'Manager Email',
                                       border: InputBorder.none,
                                     ),
                                     onChanged: (email) => context
-                                        .read<ProfileCubit>()
-                                        .managerEmailChanged(email),
+                                        .read<ProfileBloc>()
+                                        .add(ManagerEmailChanged(
+                                            managerEmail: email)),
                                     validator: (email) => email.trim().isEmpty
                                         ? 'Manager Email is required'
                                         : null,
@@ -128,13 +111,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextFormField(
-                                    initialValue: initialAdminEmail,
+                                    initialValue: state.adminEmail,
                                     decoration: InputDecoration(
                                       hintText: 'Valid Admin Email',
                                     ),
                                     onChanged: (email) => context
-                                        .read<ProfileCubit>()
-                                        .adminEmailChanged(email),
+                                        .read<ProfileBloc>()
+                                        .add(AdminEmailChanged(
+                                            adminEmail: email)),
                                     validator: (email) => email.trim().isEmpty
                                         ? 'Admin Email is required'
                                         : null,
@@ -145,16 +129,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     Padding(
                                       padding: const EdgeInsets.all(8.0),
                                       child: TextFormField(
-                                        obscureText: _showPass1,
-                                        initialValue: initialAdminEmailPassword,
+                                        obscureText: state.isPassVisible,
+                                        initialValue: state.adminPassword,
                                         decoration: InputDecoration(
                                           hintText:
                                               'Valid Admin Email Password',
                                           border: InputBorder.none,
                                         ),
                                         onChanged: (password) => context
-                                            .read<ProfileCubit>()
-                                            .adminPasswordChanged(password),
+                                            .read<ProfileBloc>()
+                                            .add(AdminEmailPasswordChanged(
+                                                adminEmailPassword: password)),
                                         validator: (password) => password
                                                 .trim()
                                                 .isEmpty
@@ -166,7 +151,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       top: 0.0,
                                       right: 18.0,
                                       child: IconButton(
-                                        icon: _showPass1
+                                        icon: state.isPassVisible
                                             ? Icon(
                                                 Icons.visibility_off,
                                                 color: Colors.black45,
@@ -174,11 +159,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               )
                                             : Icon(Icons.visibility),
                                         onPressed: () {
-                                          setState(
+                                          //TODO :: Implement Event to make this working
+                                          context.read<ProfileBloc>().add(
+                                                ToogleViewPassword(
+                                                  isVisible:
+                                                      state.isPassVisible,
+                                                ),
+                                              );
+                                          print(state.isPassVisible);
+
+                                          /*  setState(
                                             () {
                                               _showPass1 = !_showPass1;
                                             },
-                                          );
+                                          ); */
                                         },
                                       ),
                                     ),
@@ -204,13 +198,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: TextFormField(
-                                    initialValue: initialUsername,
+                                    initialValue: state.username,
                                     decoration: InputDecoration(
                                       hintText: 'username',
                                     ),
                                     onChanged: (username) => context
-                                        .read<ProfileCubit>()
-                                        .usernameChanged(username),
+                                        .read<ProfileBloc>()
+                                        .add(UsernameChanged(
+                                            username: username)),
                                     validator: (username) =>
                                         username.trim().isEmpty
                                             ? 'Username is required'
@@ -223,15 +218,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     children: [
                                       TextFormField(
                                         readOnly: true,
-                                        initialValue: state.adminPassword,
+                                        //initialValue: state.adminPassword,
                                         obscureText: _showPass2,
                                         decoration: InputDecoration(
                                           hintText: 'Password',
                                           border: InputBorder.none,
                                         ),
-                                        onChanged: (password) => context
-                                            .read<ProfileCubit>()
-                                            .passwordChanged(password),
+                                        onChanged: (password) => {},
                                         validator: (password) =>
                                             password.trim().isEmpty
                                                 ? 'Password is required'
@@ -270,40 +263,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onPrimary: Colors.white,
                               shadowColor: Colors.grey,
                             ),
-                            onPressed: () =>
-                                context.read<ProfileCubit>().submit(),
+                            onPressed: () {
+                              context.read<ProfileBloc>().add(SubmitChanges());
+                            },
                             child: Text('Update'),
                           ),
                         ],
                       ),
                     ),
                   ),
-                ),
-              );
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
-  }
-
-  Future<List<String>> loadCheckData({BuildContext context}) async {
-    final checkList = await PreloadData(
-      userRepository: context.read<UserRepository>(),
-      authBloc: context.read<AuthBloc>(),
-    ).loadInitialData();
-    if (checkList[0].isNotEmpty) {
-      initialAdminEmail = checkList[0][0];
-      initialAdminEmailPassword = checkList[0][1];
-      initialManagerEmail = checkList[1];
-    }
-    initialUsername = checkList[2].username;
-
-    print('mmmmmmmmmmmmmm');
-    print(checkList[2].toString());
-
-    return [
-      initialAdminEmail,
-      initialAdminEmailPassword,
-      initialManagerEmail,
-      initialUsername
-    ];
   }
 }

@@ -12,7 +12,7 @@ class PdfViewPageScreen extends StatelessWidget {
       appBar: AppBar(
         title: Center(child: Text('Transaction')),
       ),
-      body: PDF().fromUrl(
+      body: PDF().cachedFromUrl(
         transactionPdfUrl,
         placeholder: (double progress) => const LinearProgressIndicator(
           minHeight: 2.0,

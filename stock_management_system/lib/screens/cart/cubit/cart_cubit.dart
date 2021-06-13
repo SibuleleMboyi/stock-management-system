@@ -47,6 +47,7 @@ class CartCubit extends Cubit<CartState> {
 
   Future<void> submitOrder() async {
     emit(state.copyWith(status: CartStatus.submitting));
+
     try {
       await signedInUser();
 

@@ -71,8 +71,18 @@ class _CartScreenState extends State<CartScreen> {
                 ),
                 actions: [
                   TextButton(
-                    onPressed: () => context.read<CartCubit>().submitOrder(),
-                    child: Text('buy'),
+                    onPressed: () {
+                      state.productsList.length != 0
+                          ? context.read<CartCubit>().submitOrder()
+                          : print('cart is empty');
+                    },
+                    child: Container(
+                        padding: EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(25),
+                          color: Colors.black12,
+                        ),
+                        child: Text('buy')),
                   )
                 ],
               ),
@@ -126,7 +136,7 @@ class _CartScreenState extends State<CartScreen> {
         ),
         child: ListTile(
           contentPadding: EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-          leading: Text(index.toString() + '.'),
+          leading: Text((index + 1).toString() + '.'),
           title: Row(
             children: [
               Text(

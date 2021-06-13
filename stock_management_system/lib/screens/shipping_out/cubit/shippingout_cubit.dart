@@ -126,7 +126,27 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
   }
 
   void editProduct() async {
-    await _productRepository.updateStockProduct(product: state.product);
+    if (state.quantity == 0 && state.price == 0) {
+      return;
+    }
+    print(state.product);
+    final product = state.product.copyWith(
+      quantity: state.quantity != 0
+          ? state.quantity + state.product.quantity
+          : state.product.quantity,
+      price: state.price != 0 ? state.price : state.product.price,
+    );
+    print('Break::::::::');
+    print(product);
+    try {
+      emit(state.copyWith(status: ShippingOutStatus.submitting));
+      await _productRepository.updateStockProduct(product: product);
+      emit(state.copyWith(status: ShippingOutStatus.success));
+    } on Failure catch (err) {
+      emit(state.copyWith(
+          status: ShippingOutStatus.error,
+          failure: Failure(message: err.message)));
+    }
   }
 
   void reset() {

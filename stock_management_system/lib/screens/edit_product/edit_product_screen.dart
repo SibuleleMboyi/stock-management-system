@@ -47,7 +47,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             child: Card(
               color: Colors.white,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(12.0, 30.0, 12.0, 12.0),
+                padding: const EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 12.0),
                 child: BlocConsumer<ShippingOutCubit, ShippingOutState>(
                   listener: (context, state) {
                     if (state.status == ShippingOutStatus.success) {
@@ -69,157 +69,167 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     }
                   },
                   builder: (context, state) {
-                    return Form(
-                      key: _formkey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Stack(
-                            children: [
-                              TextFormField(
-                                decoration: InputDecoration(
-                                    labelText: 'Product Barcode',
-                                    errorText: state.errorMessage1),
-                                controller: controller,
-                                onChanged: (value) => context
-                                    .read<ShippingOutCubit>()
-                                    .productBarcodeChanged(value),
-                                validator: (value) => value.isEmpty
-                                    ? "enter or scan the product's barcode"
-                                    : null,
-                              ),
-                              Positioned(
-                                top: 8.0,
-                                right: 18.0,
-                                child: TextButton(
-                                  onPressed: () => codeScanner(context),
-                                  child: Column(children: [
-                                    Icon(
-                                      Icons.camera_alt_outlined,
-                                      color: Colors.black,
+                    return Column(
+                      children: [
+                        state.status == ShippingOutStatus.submitting
+                            ? const LinearProgressIndicator()
+                            : SizedBox.shrink(),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 15.0),
+                          child: Form(
+                            key: _formkey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Stack(
+                                  children: [
+                                    TextFormField(
+                                      decoration: InputDecoration(
+                                          labelText: 'Product Barcode',
+                                          errorText: state.errorMessage1),
+                                      controller: controller,
+                                      onChanged: (value) => context
+                                          .read<ShippingOutCubit>()
+                                          .productBarcodeChanged(value),
                                     ),
-                                    Text(
-                                      'Scanner',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.normal,
-                                        fontSize: 10.0,
+                                    Positioned(
+                                      top: 8.0,
+                                      right: 18.0,
+                                      child: TextButton(
+                                        onPressed: () => codeScanner(context),
+                                        child: Column(children: [
+                                          Icon(
+                                            Icons.camera_alt_outlined,
+                                            color: Colors.black,
+                                          ),
+                                          Text(
+                                            'Scanner',
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal,
+                                              fontSize: 10.0,
+                                            ),
+                                          ),
+                                        ]),
                                       ),
                                     ),
-                                  ]),
+                                  ],
                                 ),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16.0),
-                          Stack(
-                            children: [
-                              TextFormField(
-                                readOnly: state.isEnabled,
-                                decoration: InputDecoration(
-                                  labelText: 'Quantity',
-                                  //errorText: '*Required',
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                onChanged: (value) => context
-                                    .read<ShippingOutCubit>()
-                                    .updateProductQuantity(num.tryParse(value)),
-                                validator: (value) => value.isEmpty
-                                    ? "enter the product's quantity"
-                                    : null,
-                              ),
-                              Positioned(
-                                top: 15.0,
-                                right: 18.0,
-                                child: Column(children: [
-                                  Text(
-                                    'Current Stock :',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 10.0,
+                                SizedBox(height: 16.0),
+                                Stack(
+                                  children: [
+                                    TextFormField(
+                                      readOnly: state.isEnabled,
+                                      decoration: InputDecoration(
+                                        labelText: 'Quantity',
+                                        //errorText: '*Required',
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      onChanged: (value) => context
+                                          .read<ShippingOutCubit>()
+                                          .updateProductQuantity(
+                                              num.tryParse(value)),
                                     ),
-                                  ),
-                                  state.productBarCode != null &&
-                                          state.errorMessage1 == ''
-                                      ? Text(
-                                          state.product.quantity.toString(),
+                                    Positioned(
+                                      top: 15.0,
+                                      right: 18.0,
+                                      child: Column(children: [
+                                        Text(
+                                          'Current Stock :',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.normal,
                                             fontSize: 10.0,
                                           ),
-                                        )
-                                      : SizedBox.shrink(),
-                                ]),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16.0),
-                          Stack(
-                            children: [
-                              TextFormField(
-                                readOnly: state.isEnabled,
-                                decoration: InputDecoration(
-                                  labelText: 'Price',
-                                  //errorText: '*Required',
-                                ),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                onChanged: (value) => context
-                                    .read<ShippingOutCubit>()
-                                    .updateProductPrice(num.tryParse(value)),
-                                validator: (value) => value.isEmpty
-                                    ? "enter the product's quantity"
-                                    : null,
-                              ),
-                              Positioned(
-                                top: 15.0,
-                                right: 18.0,
-                                child: Column(children: [
-                                  Text(
-                                    'Current Stock Price:',
-                                    style: TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.normal,
-                                      fontSize: 10.0,
+                                        ),
+                                        state.productBarCode != null &&
+                                                state.errorMessage1 == ''
+                                            ? Text(
+                                                state.product.quantity
+                                                    .toString(),
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 10.0,
+                                                ),
+                                              )
+                                            : SizedBox.shrink(),
+                                      ]),
                                     ),
-                                  ),
-                                  state.productBarCode != null &&
-                                          state.errorMessage1 == ''
-                                      ? Text(
-                                          'R' + state.product.price.toString(),
+                                  ],
+                                ),
+                                SizedBox(height: 16.0),
+                                Stack(
+                                  children: [
+                                    TextFormField(
+                                      readOnly: state.isEnabled,
+                                      decoration: InputDecoration(
+                                        labelText: 'Price',
+                                        //errorText: '*Required',
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      onChanged: (value) => context
+                                          .read<ShippingOutCubit>()
+                                          .updateProductPrice(
+                                              num.tryParse(value)),
+                                      validator: (value) => value.isEmpty
+                                          ? "enter the product's quantity"
+                                          : null,
+                                    ),
+                                    Positioned(
+                                      top: 15.0,
+                                      right: 18.0,
+                                      child: Column(children: [
+                                        Text(
+                                          'Current Stock Price:',
                                           style: TextStyle(
                                             color: Colors.black,
                                             fontWeight: FontWeight.normal,
                                             fontSize: 10.0,
                                           ),
-                                        )
-                                      : SizedBox.shrink(),
-                                ]),
-                              ),
-                            ],
-                          ),
-                          SizedBox(height: 16.0),
-                          ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary: Theme.of(context).primaryColor,
-                              onPrimary: Colors.white,
-                              shadowColor: Colors.grey,
+                                        ),
+                                        state.productBarCode != null &&
+                                                state.errorMessage1 == ''
+                                            ? Text(
+                                                'R' +
+                                                    state.product.price
+                                                        .toString(),
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 10.0,
+                                                ),
+                                              )
+                                            : SizedBox.shrink(),
+                                      ]),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 16.0),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Theme.of(context).primaryColor,
+                                    onPrimary: Colors.white,
+                                    shadowColor: Colors.grey,
+                                  ),
+                                  onPressed: () => _submitForm(
+                                    context,
+                                    state.status ==
+                                        ShippingOutStatus.submitting,
+                                  ),
+                                  child: Text('submit'),
+                                ),
+                              ],
                             ),
-                            onPressed: () => _submitForm(
-                              context,
-                              state.status == ShippingOutStatus.submitting,
-                            ),
-                            child: Text('submit'),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 ),
@@ -239,7 +249,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   void _submitForm(BuildContext context, bool isSubmitting) {
-    if (_formkey.currentState.validate() && !isSubmitting) {
+    if (!isSubmitting) {
       context.read<ShippingOutCubit>().editProduct();
     }
   }

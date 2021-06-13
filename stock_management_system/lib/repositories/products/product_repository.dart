@@ -57,15 +57,11 @@ class ProductRepository extends BaseProductRepository {
   /// product is in the database.
   @override
   Future<void> updateStockProduct({@required Product product}) async {
-    DocumentSnapshot doc = await _firebaseFirestore
-        .collection(Paths.products)
-        .doc(product.productBarCode)
-        .get();
     await _firebaseFirestore
         .collection(Paths.products)
         .doc(product.productBarCode)
-        .set({
-      'quantity': doc['quantity'] + product.quantity,
+        .update({
+      'quantity': product.quantity,
       'price': product.price,
     });
   }

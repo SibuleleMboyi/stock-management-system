@@ -9,6 +9,8 @@ class ShippingInState extends Equatable {
   final String productBrand;
   final int quantity;
   final int price;
+  final String errorMessage;
+  final bool isEnabled;
   final ShippingInStatus status;
   final Failure failure;
 
@@ -18,6 +20,8 @@ class ShippingInState extends Equatable {
     @required this.productBrand,
     @required this.quantity,
     @required this.price,
+    @required this.errorMessage,
+    @required this.isEnabled,
     @required this.status,
     @required this.failure,
   });
@@ -36,6 +40,8 @@ class ShippingInState extends Equatable {
       productBrand: null,
       quantity: 0,
       price: 0,
+      errorMessage: null,
+      isEnabled: true,
       status: ShippingInStatus.initial,
       failure: Failure(),
     );
@@ -48,6 +54,8 @@ class ShippingInState extends Equatable {
         productBrand,
         quantity,
         price,
+        errorMessage,
+        isEnabled,
         status,
         failure,
       ];
@@ -58,6 +66,8 @@ class ShippingInState extends Equatable {
     String productBrand,
     int quantity,
     int price,
+    String errorMessage,
+    bool isEnabled,
     ShippingInStatus status,
     Failure failure,
   }) {
@@ -67,6 +77,8 @@ class ShippingInState extends Equatable {
       productBrand: productBrand ?? this.productBrand,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
+      errorMessage: errorMessage ?? this.errorMessage,
+      isEnabled: isEnabled ?? this.isEnabled,
       status: status ?? this.status,
       failure: failure ?? this.failure,
     );

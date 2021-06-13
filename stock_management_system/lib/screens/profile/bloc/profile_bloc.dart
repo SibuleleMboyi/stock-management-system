@@ -151,16 +151,20 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         print('Admin Email: ' + state.adminEmail);
         print('Admin Password: ' + state.adminPassword);
         final updatedUser = state.user.copyWith(
-          username: state.username ?? user.username,
+          username: state.username != '' ? state.username : user.username,
         );
 
         await _userRepository.updateUser(user: updatedUser);
 
         await _userRepository.builtInManagerUserEmail(
-            email: state.managerEmail ?? managerEmail);
+            email:
+                state.managerEmail != '' ? state.managerEmail : managerEmail);
         await _userRepository.builtInAdminEmailAccount(
-          email: state.adminEmail ?? adminCredentials[0],
-          password: state.adminPassword ?? adminCredentials[1],
+          email:
+              state.adminEmail != '' ? state.adminEmail : adminCredentials[0],
+          password: state.adminPassword != ''
+              ? state.adminPassword
+              : adminCredentials[1],
         );
 
         yield state.copyWith(status: ProfileStatus.success);

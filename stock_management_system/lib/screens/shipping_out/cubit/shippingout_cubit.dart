@@ -27,6 +27,8 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
       emit(
         state.copyWith(
           product: isProductAvailable,
+          isEnabled: false,
+          errorMessage1: '',
           productBarCode: productBarCode,
           status: ShippingOutStatus.initial,
         ),
@@ -35,9 +37,8 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
       emit(
         state.copyWith(
           product: isProductAvailable,
-          failure: Failure(
-            message: 'Product is not in stock',
-          ),
+          isEnabled: true,
+          errorMessage1: 'Product is not in stock',
           status: ShippingOutStatus.error,
         ),
       );
@@ -66,7 +67,13 @@ class ShippingOutCubit extends Cubit<ShippingOutState> {
 
   void quantityChanged(int value) {
     if (state.product.quantity >= value) {
-      emit(state.copyWith(quantity: value, status: ShippingOutStatus.initial));
+      emit(
+        state.copyWith(
+          quantity: value,
+          errorMessage2: '',
+          status: ShippingOutStatus.initial,
+        ),
+      );
     } else {
       emit(
         state.copyWith(

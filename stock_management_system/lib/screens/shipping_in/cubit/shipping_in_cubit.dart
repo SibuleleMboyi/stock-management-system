@@ -36,6 +36,8 @@ class ShippingInCubit extends Cubit<ShippingInState> {
       emit(
         state.copyWith(
           productBarCode: productBarCode,
+          isEnabled: false,
+          errorMessage: '',
           status: ShippingInStatus.initial,
         ),
       );
@@ -43,9 +45,9 @@ class ShippingInCubit extends Cubit<ShippingInState> {
       emit(
         state.copyWith(
           productBarCode: productBarCode,
-          failure: Failure(
-            message: "product barcode '$productBarCode' is already in stock.",
-          ),
+          isEnabled: true,
+          errorMessage:
+              "product barcode '$productBarCode' is already in stock.",
           status: ShippingInStatus.error,
         ),
       );

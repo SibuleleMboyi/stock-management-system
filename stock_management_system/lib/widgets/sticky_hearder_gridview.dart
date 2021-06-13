@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
-import 'package:sticky_headers/sticky_headers/widget.dart';
+import 'package:sticky_headers/sticky_headers.dart';
 import 'package:stock_management_system/screens/screens.dart';
 
-class StickyHearderGridView extends StatefulWidget {
+class StickyHearderGridView extends StatelessWidget {
   final List<String> uniqueDates;
   final Function transactionsSubListFunc;
   final String transactionPdfUrl;
@@ -16,17 +16,10 @@ class StickyHearderGridView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _StickyHearderGridViewState createState() => _StickyHearderGridViewState();
-}
-
-class _StickyHearderGridViewState extends State<StickyHearderGridView>
-    with AutomaticKeepAliveClientMixin {
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
-    return widget.transactionPdfUrl == null
+    return transactionPdfUrl == null
         ? ListView.builder(
-            itemCount: widget.uniqueDates.length,
+            itemCount: uniqueDates.length,
             itemBuilder: (context, index1) {
               return StickyHeader(
                 header: Container(
@@ -35,7 +28,7 @@ class _StickyHearderGridViewState extends State<StickyHearderGridView>
                   alignment: Alignment.topLeft,
                   padding: EdgeInsets.fromLTRB(10, 20, 0, 10),
                   child: Text(
-                    widget.uniqueDates[index1],
+                    uniqueDates[index1],
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
@@ -44,10 +37,9 @@ class _StickyHearderGridViewState extends State<StickyHearderGridView>
                   child: GridView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
-                    itemCount: widget
-                        .transactionsSubListFunc(
-                            uniqueDate: widget.uniqueDates[index1])
-                        .length,
+                    itemCount:
+                        transactionsSubListFunc(uniqueDate: uniqueDates[index1])
+                            .length,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
@@ -60,20 +52,17 @@ class _StickyHearderGridViewState extends State<StickyHearderGridView>
                               context,
                               MaterialPageRoute(
                                 builder: (context) => PdfViewPageScreen(
-                                  transactionPdfUrl: widget
-                                      .transactionsSubListFunc(
+                                  transactionPdfUrl: transactionsSubListFunc(
                                           uniqueDate:
-                                              widget.uniqueDates[index1])[index]
+                                              uniqueDates[index1])[index]
                                       .transactionPdfUrl,
                                 ),
                               ),
                             );
                           },
                           child: PdfWidget(
-                            pdfUrl: widget
-                                .transactionsSubListFunc(
-                                    uniqueDate:
-                                        widget.uniqueDates[index1])[index]
+                            pdfUrl: transactionsSubListFunc(
+                                    uniqueDate: uniqueDates[index1])[index]
                                 .transactionPdfUrl,
                           ));
                     },
@@ -83,15 +72,12 @@ class _StickyHearderGridViewState extends State<StickyHearderGridView>
             },
           )
         : PDF().cachedFromUrl(
-            widget.transactionPdfUrl,
+            transactionPdfUrl,
             placeholder: (double progress) => const LinearProgressIndicator(
               minHeight: 2.0,
             ),
           );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
 
 class PdfWidget extends StatefulWidget {

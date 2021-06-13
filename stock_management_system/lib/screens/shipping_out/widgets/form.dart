@@ -62,7 +62,7 @@ class _FormWidgetState extends State<FormWidget> {
                         TextFormField(
                           decoration: InputDecoration(
                             labelText: 'Product Barcode',
-                            errorText: errorMessage,
+                            errorText: state.errorMessage1,
                           ),
                           controller: controller,
                           onChanged: (value) => context
@@ -99,7 +99,7 @@ class _FormWidgetState extends State<FormWidget> {
                     Stack(
                       children: [
                         TextFormField(
-                          enabled: errorMessage.length == 0 ? true : false,
+                          readOnly: state.isEnabled,
                           decoration: InputDecoration(
                             labelText: 'Quantity',
                             errorText: state.errorMessage2,
@@ -127,8 +127,8 @@ class _FormWidgetState extends State<FormWidget> {
                                 fontSize: 10.0,
                               ),
                             ),
-                            ((state.productBarCode != null) &&
-                                    (errorMessage == ''))
+                            state.productBarCode != null &&
+                                    state.errorMessage1 == ''
                                 ? Text(
                                     state.product.quantity.toString(),
                                     style: TextStyle(

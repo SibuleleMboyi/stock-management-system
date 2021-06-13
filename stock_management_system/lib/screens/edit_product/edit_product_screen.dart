@@ -78,9 +78,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                             children: [
                               TextFormField(
                                 decoration: InputDecoration(
-                                  labelText: 'Product Barcode',
-                                  errorText: errorMessage,
-                                ),
+                                    labelText: 'Product Barcode',
+                                    errorText: state.errorMessage1),
                                 controller: controller,
                                 onChanged: (value) => context
                                     .read<ShippingOutCubit>()
@@ -116,8 +115,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           Stack(
                             children: [
                               TextFormField(
-                                enabled:
-                                    errorMessage.length == 0 ? true : false,
+                                readOnly: state.isEnabled,
                                 decoration: InputDecoration(
                                   labelText: 'Quantity',
                                   //errorText: '*Required',
@@ -145,8 +143,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                       fontSize: 10.0,
                                     ),
                                   ),
-                                  ((state.productBarCode != null) &&
-                                          (errorMessage == ''))
+                                  state.productBarCode != null &&
+                                          state.errorMessage1 == ''
                                       ? Text(
                                           state.product.quantity.toString(),
                                           style: TextStyle(
@@ -164,8 +162,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           Stack(
                             children: [
                               TextFormField(
-                                enabled:
-                                    errorMessage.length == 0 ? true : false,
+                                readOnly: state.isEnabled,
                                 decoration: InputDecoration(
                                   labelText: 'Price',
                                   //errorText: '*Required',
@@ -193,8 +190,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                                       fontSize: 10.0,
                                     ),
                                   ),
-                                  ((state.productBarCode != null) &&
-                                          (errorMessage == ''))
+                                  state.productBarCode != null &&
+                                          state.errorMessage1 == ''
                                       ? Text(
                                           'R' + state.product.price.toString(),
                                           style: TextStyle(

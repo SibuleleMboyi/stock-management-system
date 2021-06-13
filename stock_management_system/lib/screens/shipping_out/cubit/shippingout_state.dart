@@ -6,7 +6,10 @@ enum ShippingOutStatus { initial, submitting, success, error }
 class ShippingOutState extends Equatable {
   final Product product;
   final String productBarCode;
+  final String errorMessage1;
   final String errorMessage2;
+  final bool isEnabled;
+
   final int quantity;
   final int price;
   final List<Product> productsList;
@@ -17,7 +20,9 @@ class ShippingOutState extends Equatable {
   ShippingOutState({
     @required this.product,
     @required this.productBarCode,
+    @required this.errorMessage1,
     @required this.errorMessage2,
+    @required this.isEnabled,
     @required this.quantity,
     @required this.price,
     @required this.productsList,
@@ -30,7 +35,9 @@ class ShippingOutState extends Equatable {
         product,
         productBarCode,
         quantity,
+        errorMessage1,
         errorMessage2,
+        isEnabled,
         price,
         productsList,
         status,
@@ -43,7 +50,9 @@ class ShippingOutState extends Equatable {
     return ShippingOutState(
       product: null,
       productBarCode: null,
+      errorMessage1: null,
       errorMessage2: null,
+      isEnabled: true,
       quantity: 0,
       price: 0,
       productsList: [],
@@ -55,7 +64,9 @@ class ShippingOutState extends Equatable {
   ShippingOutState copyWith({
     Product product,
     String productBarCode,
+    String errorMessage1,
     String errorMessage2,
+    bool isEnabled,
     int quantity,
     int price,
     List<Product> productsList,
@@ -65,7 +76,9 @@ class ShippingOutState extends Equatable {
     return ShippingOutState(
       product: product ?? this.product,
       productBarCode: productBarCode ?? this.productBarCode,
+      errorMessage1: errorMessage1 ?? this.errorMessage1,
       errorMessage2: errorMessage2 ?? this.errorMessage2,
+      isEnabled: isEnabled ?? this.isEnabled,
       quantity: quantity ?? this.quantity,
       price: price ?? this.price,
       productsList: productsList ?? this.productsList,

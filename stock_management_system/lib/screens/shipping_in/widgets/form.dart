@@ -12,7 +12,6 @@ class FormWidget extends StatefulWidget {
 
 class _FormWidgetState extends State<FormWidget> {
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  String errorMessage = '';
 
   TextEditingController controller = TextEditingController();
 
@@ -37,11 +36,6 @@ class _FormWidgetState extends State<FormWidget> {
               content: const Text('New stock has been added'),
             ),
           );
-        } else if (state.status == ShippingInStatus.error) {
-          errorMessage = '*' + state.failure.message;
-        }
-        if (state.status == ShippingInStatus.initial) {
-          errorMessage = '';
         }
       },
       builder: (context, state) {
@@ -62,7 +56,7 @@ class _FormWidgetState extends State<FormWidget> {
                         TextFormField(
                           decoration: InputDecoration(
                             labelText: 'Product Barcode',
-                            errorText: errorMessage,
+                            errorText: state.errorMessage,
                           ),
                           controller: controller,
                           onChanged: (value) => context
@@ -97,6 +91,7 @@ class _FormWidgetState extends State<FormWidget> {
                     ),
                     //SizedBox(height: 10.0),
                     TextFormField(
+                      readOnly: state.isEnabled,
                       decoration: InputDecoration(
                         labelText: 'Product Name',
                         //errorText: '*Required',
@@ -109,6 +104,7 @@ class _FormWidgetState extends State<FormWidget> {
                     ),
                     SizedBox(height: 10.0),
                     TextFormField(
+                      readOnly: state.isEnabled,
                       decoration: InputDecoration(
                         labelText: 'Product Brand',
                       ),
@@ -120,6 +116,7 @@ class _FormWidgetState extends State<FormWidget> {
                     ),
                     SizedBox(height: 10.0),
                     TextFormField(
+                      readOnly: state.isEnabled,
                       decoration: InputDecoration(
                         labelText: 'Quantity',
                         //errorText: '*Required',
@@ -134,6 +131,7 @@ class _FormWidgetState extends State<FormWidget> {
                     ),
                     SizedBox(height: 10.0),
                     TextFormField(
+                      readOnly: state.isEnabled,
                       decoration: InputDecoration(
                         labelText: 'Price',
                         //errorText: '*Required',

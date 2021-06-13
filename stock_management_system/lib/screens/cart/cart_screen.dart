@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:stock_management_system/blocs/blocs.dart';
+import 'package:stock_management_system/models/models.dart';
 import 'package:stock_management_system/repositories/products/product_repository.dart';
 import 'package:stock_management_system/repositories/storage/storage_repository.dart';
 import 'package:stock_management_system/repositories/user/user_repository.dart';
 import 'package:stock_management_system/screens/cart/cubit/cart_cubit.dart';
 import 'package:stock_management_system/widgets/widgets.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   static const String routeName = '/cart';
 
   static Route route() {
@@ -23,6 +24,13 @@ class CartScreen extends StatelessWidget {
               child: CartScreen(),
             ));
   }
+
+  @override
+  _CartScreenState createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  final key = GlobalKey<AnimatedListState>();
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +54,7 @@ class CartScreen extends StatelessWidget {
       },
       builder: (context, state) {
         context.read<CartCubit>().products();
+
         return RefreshIndicator(
           onRefresh: () async {
             context.read<CartCubit>().products();
@@ -67,54 +76,26 @@ class CartScreen extends StatelessWidget {
                   )
                 ],
               ),
-              body: Stack(
+              body: Column(
                 children: [
-                  (state.status == CartStatus.submitting)
+                  state.status == CartStatus.submitting
                       ? const LinearProgressIndicator()
                       : SizedBox.shrink(),
-                  ListView.builder(
-                    itemCount: state.productsList.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      final product = state.productsList[index];
-                      final quantity = product.quantity;
-                      final price = product.price;
-                      return ListTile(
-                        leading: Text(index.toString() + ". "),
-                        title: Row(
-                          children: [
-                            Text(
-                              product.productName +
-                                  '(' +
-                                  quantity.toString() +
-                                  ')',
-                            ),
-                            SizedBox(width: 40.0),
-                          ],
-                        ),
-                        subtitle: Column(
-                          children: [
-                            Row(children: [
-                              Text('each item :'),
-                              SizedBox(width: 20),
-                              Text('R' + price.toString()),
-                            ]),
-                            Row(children: [
-                              Text('total price :'),
-                              SizedBox(width: 20),
-                              Text('R' + (quantity * price).toString()),
-                            ]),
-                          ],
-                        ),
-                        contentPadding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                        trailing: TextButton(
-                          onPressed: () {
-                            context.read<CartCubit>().removeItem(
-                                productBarCode: product.productBarCode);
-                          },
-                          child: Text('remove'),
-                        ),
-                      );
-                    },
+                  Expanded(
+                    child: state.productsList.length != 0
+                        ? AnimatedList(
+                            key: key,
+                            initialItemCount: state.productsList.length,
+                            itemBuilder: (context, index, animation) {
+                              return buildItem(
+                                state.productsList[index],
+                                index,
+                                animation,
+                                state.productsList,
+                                context,
+                              );
+                            })
+                        : SizedBox.shrink(),
                   ),
                 ],
               ),
@@ -122,6 +103,70 @@ class CartScreen extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void removedItem(int index, List items, BuildContext context) {
+    final item = items.removeAt(index);
+    key.currentState.removeItem(
+      index,
+      (context, animation) => buildItem(item, index, animation, items, context),
+    );
+  }
+
+  Widget buildItem(Product item, int index, Animation<double> animation, items,
+      BuildContext context) {
+    return ScaleTransition(
+      scale: animation,
+      child: Container(
+        margin: EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(4),
+          color: Colors.black12,
+        ),
+        child: ListTile(
+          contentPadding: EdgeInsets.symmetric(vertical: 6, horizontal: 6),
+          leading: Text(index.toString() + '.'),
+          title: Row(
+            children: [
+              Text(
+                item.productName + '(' + item.quantity.toString() + ')',
+              ),
+              SizedBox(width: 40.0),
+            ],
+          ),
+          subtitle: Column(
+            children: [
+              Row(
+                children: [],
+              ),
+              Row(
+                children: [
+                  Text('each item :'),
+                  SizedBox(width: 20),
+                  Text('R' + item.price.toString()),
+                ],
+              ),
+              Row(
+                children: [
+                  Text('total price :'),
+                  SizedBox(width: 20),
+                  Text('R' + (item.quantity * item.price).toString()),
+                ],
+              ),
+            ],
+          ),
+          trailing: TextButton(
+            onPressed: () {
+              context
+                  .read<CartCubit>()
+                  .removeItem(productBarCode: items[index].productBarCode);
+              removedItem(index, items, context);
+            },
+            child: Text('remove'),
+          ),
+        ),
+      ),
     );
   }
 }

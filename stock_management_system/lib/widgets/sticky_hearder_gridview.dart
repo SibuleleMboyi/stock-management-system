@@ -73,6 +73,9 @@ class StickyHearderGridView extends StatelessWidget {
           )
         : PDF().cachedFromUrl(
             transactionPdfUrl,
+            errorWidget: (index) {
+              return Center(child: Text('loading failed'));
+            },
             placeholder: (double progress) => const LinearProgressIndicator(
               minHeight: 2.0,
             ),
@@ -98,9 +101,11 @@ class _PdfWidgetState extends State<PdfWidget>
   Widget build(BuildContext context) {
     super.build(context);
     return Container(
-      child: PDF().fromUrl(
+      child: PDF().cachedFromUrl(
         widget.pdfUrl,
-        //errorWidget: ,
+        errorWidget: (index) {
+          return Center(child: Text('loading failed'));
+        },
         placeholder: (double progress) => Align(
           alignment: Alignment.center,
           child: const LinearProgressIndicator(

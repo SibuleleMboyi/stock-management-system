@@ -172,4 +172,27 @@ class ProductRepository extends BaseProductRepository {
 
     return invoicesLength.size + 1;
   }
+
+  /*  Future<List<Ride>> fetchRides()async{
+    final driversIDsSnapshot = await _firebaseFirestore.collection('rides').get();
+    List<String> driversIDs;
+    List<Ride>rides = [];
+
+    if(driversIDsSnapshot.docs.isNotEmpty){
+
+      /// fetches  drivers' IDs from the collection
+      driversIDsSnapshot.docs.map((driverID) => driversIDs.add(driverID.toString()),
+      );
+
+      /// gets rides of each driver's ID
+       driversIDs.forEach((driversID) async{
+        final driverRidesSnapshot = await _firebaseFirestore.collection('rides').doc(driversID).collection('rides').get();
+        rides.add(driverRidesSnapshot.docs.map((ride) => Ride.fromDocument(ride)).toList());
+     });
+  }
+    
+     return rides;
+    }
+ */
+
 }

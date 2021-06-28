@@ -10,7 +10,7 @@ class Product extends Equatable {
   final int quantity;
   final int price;
 
-  Product({
+  const Product({
     this.id,
     @required this.productBarCode,
     @required this.productName,

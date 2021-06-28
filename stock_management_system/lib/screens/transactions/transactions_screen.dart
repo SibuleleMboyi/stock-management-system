@@ -9,55 +9,80 @@ class TransactionsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<TransactionsCubit, TransactionsState>(
-      listener: (context, state) {
-        if (state.status == TransactionsStatus.success) {
-          print('I am tired!');
-        }
-      },
+    return BlocBuilder<TransactionsCubit, TransactionsState>(
       builder: (context, state) {
         context.read<TransactionsCubit>().transactionsList();
 
-        return RefreshIndicator(
-          onRefresh: () async {
-            context.read<TransactionsCubit>().reset();
-            context.read<TransactionsCubit>().transactionsList();
-            return true;
-          },
-          child: GestureDetector(
-            onTap: () => FocusScope.of(context).unfocus(),
-            child: Scaffold(
+        switch (state.status) {
+          case TransactionsStatus.error:
+            return Scaffold(
               appBar: AppBar(
-                title: Center(child: Text('Historic Transactions')),
-                actions: [
-                  IconButton(
-                      icon: Icon(Icons.search),
-                      onPressed: () {
-                        showSearch(
-                          context: context,
-                          delegate: DataSearch(
-                            transactionsList: state.transactionsList,
-                            uniqueDates: state.uniqueDates,
-                            transactionsSubListFunc: context
-                                .read<TransactionsCubit>()
-                                .transactionsSubList,
-                          ),
-                        );
-                      })
-                ],
+                title: Center(child: Text('Error')),
               ),
-              backgroundColor: Colors.white,
-              body: state.status != TransactionsStatus.success
-                  ? Center(child: const CircularProgressIndicator())
-                  : StickyHearderGridView(
-                      uniqueDates: state.uniqueDates,
-                      transactionsSubListFunc:
-                          context.read<TransactionsCubit>().transactionsSubList,
-                      transactionPdfUrl: null,
+              body: CenteredText(text: state.failure.message),
+            );
+          case TransactionsStatus.loading:
+            return Scaffold(
+              appBar: AppBar(
+                  title: Center(child: Text('Historic Transactions')),
+                  actions: [
+                    IconButton(
+                      icon: Icon(Icons.search),
+                      onPressed: () {},
                     ),
-            ),
-          ),
-        );
+                  ]),
+              body: Align(
+                child: const CircularProgressIndicator(),
+              ),
+            );
+
+          case TransactionsStatus.success:
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<TransactionsCubit>().reset();
+                context.read<TransactionsCubit>().transactionsList();
+                return true;
+              },
+              child: GestureDetector(
+                onTap: () => FocusScope.of(context).unfocus(),
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Center(child: Text('Historic Transactions')),
+                    actions: [
+                      IconButton(
+                          icon: Icon(Icons.search),
+                          onPressed: () {
+                            showSearch(
+                              context: context,
+                              delegate: DataSearch(
+                                transactionsList: state.transactionsList,
+                                uniqueDates: state.uniqueDates,
+                                transactionsSubListFunc: context
+                                    .read<TransactionsCubit>()
+                                    .transactionsSubList,
+                              ),
+                            );
+                          })
+                    ],
+                  ),
+                  backgroundColor: Colors.white,
+                  body: state.transactionsList.isNotEmpty
+                      ? StickyHearderGridView(
+                          uniqueDates: state.uniqueDates,
+                          transactionsSubListFunc: context
+                              .read<TransactionsCubit>()
+                              .transactionsSubList,
+                          transactionPdfUrl: null,
+                        )
+                      : CenteredText(text: 'No historic transactions yet'),
+                ),
+              ),
+            );
+
+            break;
+          default:
+            return const SizedBox.shrink();
+        }
       },
     );
   }

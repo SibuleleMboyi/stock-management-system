@@ -34,7 +34,8 @@ class TransactionsCubit extends Cubit<TransactionsState> {
     } catch (err) {
       state.copyWith(
           status: TransactionsStatus.error,
-          failure: const Failure(message: 'We are unable to load your feed.'));
+          failure: const Failure(
+              message: 'We are unable to load your Historis Transactions.'));
     }
 
     //print(state.transactionsList[0].transactionPdfUrl);
